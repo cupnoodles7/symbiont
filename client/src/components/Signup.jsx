@@ -132,53 +132,6 @@ function Signup({ onSwitchToLogin, onComplete }) {
 
                 return; // Exit early for testing
 
-                // Original Firebase code (commented out for testing)
-                /*
-                // Create user with Firebase Auth
-                const userCredential = await createUserWithEmailAndPassword(
-                    auth,
-                    formData.email,
-                    formData.password
-                );
-
-                console.log('Firebase Auth successful, user:', userCredential.user);
-                console.log('Starting Firestore write...');
-
-                // Save additional user data to Firestore
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    fullName: formData.fullName,
-                    dateOfBirth: formData.dateOfBirth,
-                    weight: formData.weight,
-                    height: formData.height,
-                    medicalConditions: formData.medicalConditions,
-                    shareWithCaregiver: formData.shareWithCaregiver,
-                    caregiverEmail: formData.caregiverEmail,
-                    createdAt: new Date().toISOString()
-                });
-
-                console.log('Firestore write successful');
-                console.log('Account created successfully:', userCredential.user);
-                console.log('Calling onComplete callback...');
-                
-                // Call onComplete with user data
-                if (onComplete) {
-                    console.log('onComplete function exists, calling it...');
-                    onComplete({
-                        uid: userCredential.user.uid,
-                        email: userCredential.user.email,
-                        fullName: formData.fullName,
-                        dateOfBirth: formData.dateOfBirth,
-                        weight: formData.weight,
-                        height: formData.height,
-                        medicalConditions: formData.medicalConditions,
-                        shareWithCaregiver: formData.shareWithCaregiver,
-                        caregiverEmail: formData.caregiverEmail
-                    });
-                    console.log('onComplete callback executed');
-                } else {
-                    console.log('onComplete callback not provided');
-                }
-                */
 
             } catch (err) {
                 console.error('Signup error details:', err);
@@ -210,7 +163,7 @@ function Signup({ onSwitchToLogin, onComplete }) {
 
     const steps = [
         {
-            title: "Welcome to CapyCare!",
+            title: "Welcome to Aura Health!",
             subtitle: "Let's get started with your wellness journey",
             type: "welcome"
         },
