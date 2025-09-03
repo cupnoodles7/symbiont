@@ -710,81 +710,213 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .steps-indicator {
-        gap: 20px;
+    .multi-step-container {
+        min-height: 100vh;
+        overflow-y: auto;
     }
 
-    .step-title {
-        font-size: 12px;
-        max-width: 80px;
-    }
-
-    .content-card {
-        padding: 30px 20px;
-        margin: 10px;
-    }
-
-    .card-title {
-        font-size: 24px;
-    }
-
-    .step-actions {
-        flex-direction: column;
-    }
-
-    .primary-button,
-    .secondary-button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
     .steps-header {
-        padding: 15px;
+        padding: 15px 10px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .steps-indicator {
         gap: 15px;
-    }
-
-    .step-number {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .step-title {
         font-size: 11px;
         max-width: 70px;
+        line-height: 1.2;
     }
 
     .main-content {
-        padding: 20px 10px;
+        padding: 15px 10px;
+        min-height: calc(100vh - 120px);
+        align-items: flex-start;
+        justify-content: flex-start;
     }
 
     .content-card {
         padding: 25px 15px;
+        margin: 0;
+        max-width: 100%;
+        border-radius: 15px;
+        min-height: auto;
     }
 
     .card-title {
         font-size: 22px;
+        margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+        font-size: 14px;
+    }
+
+    .step-content {
+        gap: 20px;
+    }
+
+    .capybara-illustration {
+        margin-bottom: 15px;
+    }
+
+    .capybara-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .form-fields {
+        gap: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 0;
     }
 
     .form-input {
         padding: 14px 16px;
         font-size: 14px;
+        border-radius: 10px;
+    }
+
+    .step-actions {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .welcome-actions {
+        gap: 15px;
+    }
+
+    .review-fields {
+        gap: 12px;
     }
 
     .review-group {
-        padding: 14px 16px;
+        padding: 12px 14px;
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 6px;
+        border-radius: 10px;
     }
 
     .review-value {
         text-align: left;
         max-width: none;
+        font-size: 13px;
+    }
+
+    .toggle-group {
+        margin-top: 10px;
+    }
+
+    .toggle-label {
+        font-size: 14px;
+        padding: 12px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .steps-header {
+        padding: 12px 8px;
+    }
+
+    .steps-indicator {
+        gap: 12px;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .step-title {
+        font-size: 10px;
+        max-width: 60px;
+    }
+
+    .main-content {
+        padding: 12px 8px;
+        min-height: calc(100vh - 100px);
+    }
+
+    .content-card {
+        padding: 20px 12px;
+        border-radius: 12px;
+    }
+
+    .card-title {
+        font-size: 20px;
+    }
+
+    .card-subtitle {
+        font-size: 13px;
+    }
+
+    .step-content {
+        gap: 15px;
+    }
+
+    .capybara-image {
+        width: 70px;
+        height: 70px;
+    }
+
+    .form-fields {
+        gap: 12px;
+    }
+
+    .form-input {
+        padding: 12px 14px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .step-actions {
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .primary-button,
+    .secondary-button {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    .review-group {
+        padding: 10px 12px;
+        gap: 5px;
+        border-radius: 8px;
+    }
+
+    .review-value {
+        font-size: 12px;
+    }
+
+    .toggle-label {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .error-message {
+        font-size: 12px;
+        padding: 8px 12px;
+        border-radius: 8px;
     }
 }
 
