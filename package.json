@@ -1,0 +1,48 @@
+{
+  "name": "capy-project",
+  "version": "1.0.0",
+  "description": "A virtual pet capybara game with React frontend and Express backend",
+  "private": true,
+  "scripts": {
+    "install:all": "npm run install:server && npm run install:client",
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm start",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "atlas": "node buildAtlasJson.js",
+    "setup": "npm run install:all && npm run atlas",
+    "start": "npm run dev",
+    "lint": "cd client && npm run lint",
+    "clean": "npm run clean:client && npm run clean:server",
+    "clean:client": "cd client && rm -rf node_modules package-lock.json",
+    "clean:server": "cd server && rm -rf node_modules package-lock.json"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "capybara",
+    "virtual-pet",
+    "game",
+    "react",
+    "express",
+    "socket.io",
+    "nodejs"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/capy-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/capy-project/issues"
+  },
+  "homepage": "https://github.com/yourusername/capy-project#readme"
+}

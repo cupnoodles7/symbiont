@@ -1,0 +1,17 @@
+{
+  "name": "capy-project-requirements",
+  "version": "1.0.0",
+  "description": "Requirements and setup files for the Capy Project",
+  "main": "README.md",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "peerDependencies": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
