@@ -1,3 +1,4 @@
+/* Sophisticated Nutrition Tracker Design */
 .nutrition-tracker {
     padding: 20px;
     max-width: 1200px;
@@ -6,19 +7,32 @@
     flex-direction: column;
     gap: 20px;
     overflow-x: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Daily Calorie Summary Styles */
+/* Elegant Daily Calorie Summary */
 .daily-summary {
-    background: var(--card-bg, #ffffff);
-    border-radius: 20px;
+    background: linear-gradient(135deg, #f0ead2 0%, #f8f5e8 100%);
+    border-radius: 8px;
     padding: 2rem;
-    color: var(--text-primary, #333);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    color: #6c584c;
+    box-shadow: 0 2px 8px rgba(108, 88, 76, 0.1);
     margin-bottom: 2rem;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid #dde5b6;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+}
+
+.daily-summary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #adc178, #a98467);
+    border-radius: 8px 8px 0 0;
 }
 
 .summary-header {
@@ -37,9 +51,10 @@
 
 .header-top h2 {
     margin: 0;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary, #333);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #6c584c;
+    letter-spacing: -0.02em;
 }
 
 .header-controls {
@@ -52,64 +67,65 @@
 
 .view-toggle {
     display: flex;
-    background: var(--border-color, #e0e0e0);
-    border-radius: 25px;
+    background: #f0ead2;
+    border-radius: 6px;
     padding: 0.25rem;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid #dde5b6;
 }
 
 .toggle-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary, #666);
+    color: #6c584c;
     padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     min-width: 60px;
+    font-family: inherit;
 }
 
 .toggle-btn.active {
-    background: var(--primary-color, #4a90e2);
-    color: white;
-    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+    background: #adc178;
+    color: #f0ead2;
+    box-shadow: 0 1px 3px rgba(173, 193, 120, 0.3);
 }
 
 .toggle-btn:hover:not(.active) {
-    background: var(--border-color, #e0e0e0);
-    color: var(--text-primary, #333);
+    background: #dde5b6;
+    color: #6c584c;
 }
 
 .goal-edit-btn {
-    background: var(--border-color, #e0e0e0);
-    border: 2px solid var(--border-color, #e0e0e0);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    background: #f0ead2;
+    border: 1px solid #dde5b6;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
-    color: var(--text-primary, #333);
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    color: #6c584c;
 }
 
 .goal-edit-btn:hover {
-    background: var(--primary-color, #4a90e2);
-    border-color: var(--primary-color, #4a90e2);
-    color: white;
-    transform: scale(1.1);
+    background: #adc178;
+    border-color: #adc178;
+    color: #f0ead2;
+    transform: translateY(-1px);
 }
 
 .goal-editor {
-    background: var(--card-bg-secondary, #f8f9fa);
-    border-radius: 15px;
+    background: #f8f5e8;
+    border-radius: 6px;
     padding: 1.5rem;
     margin-top: 1rem;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid #dde5b6;
 }
 
 .goal-input-group {
@@ -120,75 +136,77 @@
 }
 
 .goal-input-group label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary, #333);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6c584c;
 }
 
 .goal-input {
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
-    background: var(--card-bg, #ffffff);
-    color: var(--text-primary, #333);
-    font-size: 1rem;
-    font-weight: 600;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #dde5b6;
+    border-radius: 4px;
+    background: #f0ead2;
+    color: #6c584c;
+    font-size: 0.875rem;
+    font-weight: 500;
     text-align: center;
-    width: 150px;
-    transition: all 0.3s ease;
+    width: 120px;
+    transition: all 0.2s ease;
     box-sizing: border-box;
+    font-family: inherit;
 }
 
 .goal-input:focus {
     outline: none;
-    border-color: var(--primary-color, #4a90e2);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    border-color: #adc178;
+    box-shadow: 0 0 0 3px rgba(173, 193, 120, 0.1);
 }
 
 .goal-actions {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .goal-save-btn,
 .goal-cancel-btn {
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .goal-save-btn {
-    background: var(--success-color, #28a745);
-    color: white;
+    background: #adc178;
+    color: #f0ead2;
 }
 
 .goal-save-btn:hover {
-    background: var(--success-dark, #218838);
-    transform: translateY(-2px);
+    background: #a98467;
+    transform: translateY(-1px);
 }
 
 .goal-cancel-btn {
-    background: var(--border-color, #e0e0e0);
-    color: var(--text-primary, #333);
-    border: 1px solid var(--border-color, #e0e0e0);
+    background: #f0ead2;
+    color: #6c584c;
+    border: 1px solid #dde5b6;
 }
 
 .goal-cancel-btn:hover {
-    background: var(--text-secondary, #666);
-    color: white;
-    transform: translateY(-2px);
+    background: #dde5b6;
+    color: #6c584c;
+    transform: translateY(-1px);
 }
 
 .date-display {
-    font-size: 1.1rem;
-    color: var(--text-secondary, #666);
-    font-weight: 500;
+    font-size: 0.875rem;
+    color: #6c584c;
+    font-weight: 400;
 }
 
 .calorie-overview {
@@ -210,21 +228,24 @@
 }
 
 .calorie-number {
-    font-size: 3.5rem;
-    font-weight: 800;
+    font-size: 3rem;
+    font-weight: 700;
     line-height: 1;
-    color: var(--primary-color, #4a90e2);
+    color: #a98467;
+    letter-spacing: -0.02em;
 }
 
 .calorie-unit {
-    font-size: 1.2rem;
-    color: var(--text-secondary, #666);
-    font-weight: 500;
+    font-size: 1rem;
+    color: #6c584c;
+    font-weight: 400;
+    margin-top: 0.25rem;
 }
 
 .calorie-goal {
-    font-size: 1rem;
-    color: var(--text-secondary, #666);
+    font-size: 0.875rem;
+    color: #6c584c;
+    font-weight: 400;
 }
 
 .calorie-progress {
@@ -235,17 +256,17 @@
 
 .progress-bar {
     width: 100%;
-    height: 12px;
-    background: var(--border-color, #e0e0e0);
-    border-radius: 6px;
+    height: 8px;
+    background: #f0ead2;
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--primary-color, #4a90e2);
-    border-radius: 6px;
+    background: linear-gradient(90deg, #adc178, #a98467);
+    border-radius: 4px;
     transition: width 0.6s ease;
     position: relative;
 }
@@ -257,7 +278,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(240, 234, 210, 0.3), transparent);
     animation: shimmer 2s infinite;
 }
 
@@ -273,9 +294,9 @@
 
 .progress-text {
     text-align: center;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary, #333);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6c584c;
 }
 
 .calorie-remaining {
@@ -286,75 +307,113 @@
 }
 
 .remaining-label {
-    font-size: 0.9rem;
-    color: var(--text-secondary, #666);
+    font-size: 0.75rem;
+    color: #6c584c;
+    font-weight: 400;
 }
 
 .remaining-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--success-color, #28a745);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #adc178;
+}
+
+.net-calories {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.net-label {
+    font-size: 0.75rem;
+    color: #6c584c;
+    font-weight: 400;
+}
+
+.net-value {
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
 .search-section {
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f0ead2 0%, #f8f5e8 100%);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(108, 88, 76, 0.1);
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid #dde5b6;
+}
+
+.search-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #6c584c;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
 }
 
 .search-form {
     display: flex;
-    gap: 10px;
-    margin: 20px 0;
+    gap: 0.75rem;
+    margin: 1rem 0;
     flex-wrap: wrap;
 }
 
 .search-input {
     flex: 1;
     min-width: 200px;
-    padding: 12px 16px;
-    border: 2px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dde5b6;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
     box-sizing: border-box;
+    font-family: inherit;
+    background: #f0ead2;
+    color: #6c584c;
 }
 
 .search-input:focus {
-    border-color: var(--primary-color, #4a90e2);
+    border-color: #adc178;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(173, 193, 120, 0.1);
 }
 
 .search-button {
-    padding: 12px 24px;
-    background-color: var(--primary-color, #4a90e2);
-    color: white;
+    padding: 0.75rem 1.5rem;
+    background: #adc178;
+    color: #f0ead2;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: inherit;
 }
 
 .search-button:hover {
-    background-color: var(--primary-dark, #357abd);
+    background: #a98467;
+    transform: translateY(-1px);
 }
 
 .search-button:disabled {
-    background-color: var(--disabled-color, #cccccc);
+    background: #dde5b6;
     cursor: not-allowed;
+    transform: none;
 }
 
 .error-message {
-    color: var(--error-color, #dc3545);
-    padding: 10px;
-    margin: 10px 0;
-    background-color: var(--error-bg, #fff3f3);
-    border-radius: 6px;
+    color: #a98467;
+    padding: 0.75rem;
+    margin: 0.75rem 0;
+    background: #f8f5e8;
+    border-radius: 4px;
+    border: 1px solid #dde5b6;
+    font-size: 0.875rem;
 }
 
 .search-results {

@@ -640,6 +640,141 @@ Assistant:`;
   }
 });
 
+// Route 10: Health Task Generation with AI
+app.post("/api/gemini/health-tasks", async (req, res) => {
+  try {
+    if (!genAI) {
+      return res.status(503).json({
+        error: "AI service unavailable",
+        message: "Gemini API key is not configured"
+      });
+    }
+
+    const { context, userData, weatherData } = req.body;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `You are an AI Health Agent that creates personalized daily health tasks (quests) for users. 
+
+Based on the provided context, generate 3-5 engaging health tasks that are:
+1. Weather-appropriate (indoor vs outdoor activities)
+2. Personalized to the user's health goals and fitness level
+3. Varied in difficulty and category
+4. Motivating and achievable
+
+Context provided:
+- User Profile: ${JSON.stringify(context.userProfile)}
+- Weather: ${JSON.stringify(context.weather)}
+- Performance: ${JSON.stringify(context.performance)}
+
+Generate tasks in this exact JSON format:
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Task Title",
+      "description": "Detailed description of what to do",
+      "category": "hydration|fitness|nutrition|mental|sleep",
+      "difficulty": "easy|moderate|hard",
+      "points": 10-30,
+      "icon": "relevant emoji",
+      "weatherAdapted": true/false,
+      "weatherReason": "explanation if weather-adapted"
+    }
+  ]
+}
+
+Rules:
+- If weather is rainy/snowy/extreme temps, suggest indoor activities
+- If weather is nice, suggest outdoor activities
+- Consider user's fitness level and health goals
+- Mix easy and moderate tasks, avoid too many hard tasks
+- Include at least one weather-adapted task
+- Make tasks specific and actionable
+- Use appropriate emojis for icons
+
+Return ONLY the JSON response, no additional text.`;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // Try to parse the JSON response
+    try {
+      const tasksData = JSON.parse(text);
+      res.json(tasksData);
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      // Return fallback tasks if parsing fails
+      res.json({
+        tasks: [
+          {
+            id: 1,
+            title: "Hydration Challenge",
+            description: "Drink 8 glasses of water throughout the day",
+            category: "hydration",
+            difficulty: "easy",
+            points: 10,
+            icon: "💧",
+            weatherAdapted: false
+          },
+          {
+            id: 2,
+            title: "Mindful Breathing",
+            description: "Practice 5 minutes of deep breathing exercises",
+            category: "mental",
+            difficulty: "easy",
+            points: 15,
+            icon: "🧘",
+            weatherAdapted: false
+          },
+          {
+            id: 3,
+            title: context.weather.isIndoor ? "Indoor Stretching" : "Outdoor Walk",
+            description: context.weather.isIndoor
+              ? "Complete a 10-minute stretching routine"
+              : "Take a 20-minute walk outside",
+            category: "fitness",
+            difficulty: "moderate",
+            points: 20,
+            icon: context.weather.isIndoor ? "🧘‍♀️" : "🚶",
+            weatherAdapted: true,
+            weatherReason: context.weather.isIndoor
+              ? "Indoor activity due to weather conditions"
+              : "Perfect weather for outdoor activity"
+          }
+        ]
+      });
+    }
+
+  } catch (error) {
+    console.error('Health Tasks API Error:', error);
+
+    // Handle specific Gemini API errors
+    if (error.message.includes('API_KEY_INVALID')) {
+      return res.status(401).json({
+        error: "Invalid API key",
+        message: "Please check your Gemini API key configuration"
+      });
+    }
+
+    if (error.message.includes('QUOTA_EXCEEDED')) {
+      return res.status(429).json({
+        error: "Rate limit exceeded",
+        message: "You've reached the free tier limit. Please wait a moment and try again, or upgrade your plan for higher limits.",
+        retryAfter: "33s"
+      });
+    }
+
+    res.status(500).json({
+      error: "AI service error",
+      message: "Failed to generate health tasks",
+      details: error.message
+    });
+  }
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
@@ -663,7 +798,8 @@ app.use((req, res) => {
       'GET /barcode/:upc',
       'GET /health',
       'GET /trigger/:state',
-      'POST /api/gemini/chat'
+      'POST /api/gemini/chat',
+      'POST /api/gemini/health-tasks'
     ]
   });
 });
@@ -684,6 +820,7 @@ Available endpoints:
 - POST /process-image             (Process food images)
 - POST /upload-photos             (Upload food photos)
 - POST /api/gemini/chat          (AI Chat Assistant)
+- POST /api/gemini/health-tasks   (AI Health Task Generation)
 
 🚀 Server is ready to handle requests!
   `);

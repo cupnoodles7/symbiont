@@ -13,7 +13,6 @@ export default function WorkoutAnalyzer() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('video/')) {
         setError("Please select a valid video file");
         setVideo(null);
@@ -22,8 +21,7 @@ export default function WorkoutAnalyzer() {
         return;
       }
 
-      // Validate file size (max 100MB)
-      const maxSize = 100 * 1024 * 1024; // 100MB
+      const maxSize = 100 * 1024 * 1024;
       if (file.size > maxSize) {
         setError("File size too large. Please select a video under 100MB");
         setVideo(null);
@@ -66,141 +64,242 @@ export default function WorkoutAnalyzer() {
   };
 
   return (
-    <div className="analyzer">
-      <h2>🏋️ AI Workout Analyzer</h2>
-      
-      <div className="upload-section">
-        <h3>Upload Your Workout Video</h3>
-        <p>Get instant feedback on your form and rep count</p>
-        
-        <div className="file-input-container">
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleFileChange}
-            className="file-input"
-            id="video-upload"
-          />
-          <label 
-            htmlFor="video-upload" 
-            className={`file-input-label ${video ? 'has-file' : ''}`}
-          >
-            {video ? '✓ Video Selected' : '📹 Choose Video File'}
-          </label>
+    <div className="workout-analyzer">
+      {/* Header Section */}
+      <div className="analyzer-header">
+        <div className="header-content">
+          <h1>Workout Analysis</h1>
+          <p>AI-powered form assessment and rep counting</p>
         </div>
-
-        {video && (
-          <div className="file-info">
-            <div className="file-name">{fileName}</div>
-            <div className="file-size">{fileSize}</div>
-          </div>
-        )}
-
-        <button 
-          className={`analyze-btn ${isLoading ? 'loading' : ''}`}
-          onClick={handleUpload}
-          disabled={!video || isLoading}
-        >
-          {isLoading ? (
-            <>
-              <span className="loading-spinner"></span>
-              Analyzing...
-            </>
-          ) : (
-            '🔍 Analyze Workout'
-          )}
-        </button>
       </div>
 
+      {/* Upload Section */}
+      <div className="upload-section">
+        <div className="upload-container">
+          <div className="upload-area">
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleFileChange}
+              className="file-input"
+              id="video-upload"
+            />
+            <label htmlFor="video-upload" className="upload-label">
+              <div className="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7,10 12,15 17,10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </div>
+              <div className="upload-text">
+                <span className="upload-title">Upload Workout Video</span>
+                <span className="upload-subtitle">MP4, MOV, or AVI up to 100MB</span>
+              </div>
+            </label>
+          </div>
+
+          {video && (
+            <div className="file-info">
+              <div className="file-details">
+                <span className="file-name">{fileName}</span>
+                <span className="file-size">{fileSize}</span>
+              </div>
+            </div>
+          )}
+
+          <button
+            className={`analyze-button ${isLoading ? 'loading' : ''}`}
+            onClick={handleUpload}
+            disabled={!video || isLoading}
+          >
+            {isLoading ? (
+              <>
+                <div className="spinner"></div>
+                <span>Analyzing...</span>
+              </>
+            ) : (
+              <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                <span>Analyze Workout</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Error Message */}
       {error && (
-        <div className="error-message">
-          {error}
+        <div className="error-container">
+          <div className="error-message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
+            <span>{error}</span>
+          </div>
         </div>
       )}
 
+      {/* Results Section */}
       {feedback && (
-        <div className="results">
-          <h3>🎯 Workout Analysis Results</h3>
-          
-          <div className="workout-stats">
+        <div className="results-section">
+          <div className="results-header">
+            <h2>Analysis Results</h2>
+            <p>Your workout performance breakdown</p>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-value">{feedback.summary?.squats || 0}</div>
-              <div className="stat-label">Squats Detected</div>
+              <div className="stat-label">Squats</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">{feedback.summary?.pushups || 0}</div>
-              <div className="stat-label">Push-ups Detected</div>
+              <div className="stat-label">Push-ups</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">{feedback.summary?.backrows || 0}</div>
-              <div className="stat-label">Back Rows Detected</div>
+              <div className="stat-label">Back Rows</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">{feedback.duration_sec || 0}s</div>
               <div className="stat-label">Duration</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.workout_type || 'Unknown'}</div>
-              <div className="stat-label">Workout Type</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.frames_analyzed || 0}</div>
-              <div className="stat-label">Frames Analyzed</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.summary?.confidence || 0}%</div>
-              <div className="stat-label">Detection Confidence</div>
-            </div>
           </div>
 
+          {/* Form Scores */}
           {feedback.form_scores && (
             <div className="form-scores">
-              <h4>📊 Form Scores</h4>
-              <div className="score-grid">
-                <div className="score-item">
-                  <span className="score-label">Push-ups:</span>
-                  <span className="score-value">{feedback.form_scores.pushup}/100</span>
-                </div>
-                <div className="score-item">
-                  <span className="score-label">Squats:</span>
-                  <span className="score-value">{feedback.form_scores.squat}/100</span>
-                </div>
-                <div className="score-item">
-                  <span className="score-label">Back Rows:</span>
-                  <span className="score-value">{feedback.form_scores.backrow}/100</span>
-                </div>
+              <h3>Form Assessment</h3>
+              <div className="scores-grid">
+                {feedback.summary?.pushups > 0 && (
+                  <div className="score-item">
+                    <div className="score-header">
+                      <span className="score-label">Push-ups</span>
+                      <span className="score-value">{feedback.form_scores.pushup}/100</span>
+                    </div>
+                    <div className="score-bar">
+                      <div
+                        className="score-fill"
+                        style={{ width: `${feedback.form_scores.pushup}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+                {feedback.summary?.squats > 0 && (
+                  <div className="score-item">
+                    <div className="score-header">
+                      <span className="score-label">Squats</span>
+                      <span className="score-value">{feedback.form_scores.squat}/100</span>
+                    </div>
+                    <div className="score-bar">
+                      <div
+                        className="score-fill"
+                        style={{ width: `${feedback.form_scores.squat}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+                {feedback.summary?.backrows > 0 && (
+                  <div className="score-item">
+                    <div className="score-header">
+                      <span className="score-label">Back Rows</span>
+                      <span className="score-value">{feedback.form_scores.backrow}/100</span>
+                    </div>
+                    <div className="score-bar">
+                      <div
+                        className="score-fill"
+                        style={{ width: `${feedback.form_scores.backrow}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
+          {/* Form Issues */}
           {feedback.form_issues && feedback.form_issues.length > 0 && (
             <div className="form-issues">
-              <h4>⚠️ Form Issues Detected</h4>
-              <ul className="issue-list">
+              <h3>Form Recommendations</h3>
+              <div className="issues-list">
                 {feedback.form_issues.map((issue, index) => (
-                  <li key={index}>{issue}</li>
+                  <div key={index} className="issue-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>{issue}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {feedback.form_issues && feedback.form_issues.length === 0 && (
             <div className="success-message">
-              🎉 Great form! No issues detected in your workout.
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22,4 12,14.01 9,11.01" />
+              </svg>
+              <div className="success-content">
+                <h3>Excellent Form!</h3>
+                <p>No issues detected in your workout. Keep up the great work!</p>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      <div className="upload-section how-it-works">
-        <h3>💡 How It Works</h3>
-        <p>Our AI analyzes your workout video using computer vision to:</p>
-        <ul>
-          <li>🎯 Count your repetitions accurately</li>
-          <li>📐 Assess your form and posture</li>
-          <li>⚠️ Identify potential injury risks</li>
-          <li>📊 Track your progress over time</li>
-        </ul>
+      {/* How It Works */}
+      <div className="how-it-works">
+        <h3>How It Works</h3>
+        <div className="features-grid">
+          <div className="feature-item">
+            <div className="feature-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+              </svg>
+            </div>
+            <div className="feature-content">
+              <h4>Rep Counting</h4>
+              <p>Accurate repetition tracking with AI vision</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <div className="feature-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <div className="feature-content">
+              <h4>Form Analysis</h4>
+              <p>Real-time posture and movement assessment</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <div className="feature-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 12l2 2 4-4" />
+                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+              </svg>
+            </div>
+            <div className="feature-content">
+              <h4>Progress Tracking</h4>
+              <p>Monitor improvements over time</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
