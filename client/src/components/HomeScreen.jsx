@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from '../contexts/UserContext';
 import './HomeScreen.css';
 import NutritionTracker from './NutritionTracker';
 import Community from './community'; // Ensure file is capitalized if named Community.js
-
+import Profile from './Profile';
 import AIChatAssistant from './AIChatAssistant';
 
 function HomeScreen() {
+    const { userData } = useUser();
     const [activeTab, setActiveTab] = useState('home');
     const [currentTime, setCurrentTime] = useState(new Date());
     const [capybaraMood, setCapybaraMood] = useState('happy');
@@ -32,7 +34,9 @@ function HomeScreen() {
             {/* Left Sidebar */}
             <div className="left-sidebar">
                 <div className="greeting-card">
-                    <div className="greeting-text">{getGreeting()}, Friend!</div>
+                    <div className="greeting-text">
+                        {getGreeting()}, {userData?.fullName ? userData.fullName.split(' ')[0] : 'Friend'}!
+                    </div>
                     <div className="time-text">{formatTime(currentTime)}</div>
                     <div className="weather-widget">
                         <span className="weather-icon">☀️</span>
@@ -191,15 +195,7 @@ function HomeScreen() {
     // Profile Tab
     const renderProfileContent = () => (
         <div className="tab-content profile-tab">
-            <div className="tab-header">
-                <h2>👤 Profile & Settings</h2>
-                <p>Manage your account and preferences</p>
-            </div>
-            <div className="coming-soon">
-                <div className="coming-soon-icon">👤</div>
-                <h3>Profile Dashboard</h3>
-                <p>Coming soon - Manage your profile and app settings with advanced customization</p>
-            </div>
+            <Profile />
         </div>
     );
 
@@ -255,9 +251,11 @@ function HomeScreen() {
                         </button>
 
                         <div className="user-profile">
-                            <div className="user-avatar">U</div>
+                            <div className="user-avatar">
+                                {userData?.fullName ? userData.fullName.charAt(0).toUpperCase() : 'U'}
+                            </div>
                             <div className="user-details">
-                                <span className="user-name">User</span>
+                                <span className="user-name">{userData?.fullName || 'User'}</span>
                                 <span className="user-status">● Online</span>
                             </div>
                         </div>
