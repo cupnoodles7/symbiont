@@ -42,6 +42,16 @@ const upload = multer({
 const APP_ID = process.env.APP_ID;
 const APP_KEY = process.env.APP_KEY;
 
+// Debug environment variables
+console.log('Environment Variables:', {
+  APP_ID: APP_ID ? 'Set' : 'Not set',
+  APP_KEY: APP_KEY ? 'Set' : 'Not set'
+});
+
+if (!APP_ID || !APP_KEY) {
+  console.error('Missing Nutritionix API credentials. Please check your .env file');
+}
+
 const headers = {
   "x-app-id": APP_ID,
   "x-app-key": APP_KEY,
@@ -114,12 +124,23 @@ app.get("/health", (req, res) => {
 // Route 3: Search for foods (quick search with limited data)
 app.get("/search", async (req, res) => {
   try {
+    // Check if API credentials are set
+    if (!APP_ID || !APP_KEY) {
+      console.error('API credentials missing');
+      return res.status(500).json({ 
+        error: "Server configuration error", 
+        message: "API credentials are not configured"
+      });
+    }
+
     const query = req.query.food;
     if (!query) {
       return res.status(400).json({ error: "Please provide a food query (?food=...)" });
     }
 
+    console.log('Making search request for:', query);
     const url = "https://trackapi.nutritionix.com/v2/search/instant";
+    
     const response = await axios.get(url, {
       headers,
       params: { query }

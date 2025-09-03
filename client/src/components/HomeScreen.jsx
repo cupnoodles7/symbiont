@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './HomeScreen.css';
+import NutritionTracker from './NutritionTracker';
 
 function HomeScreen({ userData, healthData }) {
     const [activeTab, setActiveTab] = useState('home');
@@ -180,11 +181,7 @@ function HomeScreen({ userData, healthData }) {
                 <h2>🍎 Nutrition Center</h2>
                 <p>Track your daily nutrition and meal planning</p>
             </div>
-            <div className="coming-soon">
-                <div className="coming-soon-icon">🥗</div>
-                <h3>Nutrition Dashboard</h3>
-                <p>Coming soon - Track your meals, calories, and nutrition goals with detailed analytics</p>
-            </div>
+            <NutritionTracker />
         </div>
     );
 
