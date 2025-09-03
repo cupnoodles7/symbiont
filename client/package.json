@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
+    "axios": "^1.11.0",
     "firebase": "^12.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

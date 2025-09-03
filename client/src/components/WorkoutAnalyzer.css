@@ -1,0 +1,404 @@
+/* Workout Analyzer - Matching App Theme */
+:root {
+    --parchment: #f0ead2ff;
+    --tea-green: #dde5b6ff;
+    --olivine: #adc178ff;
+    --chamoisee: #a98467ff;
+    --umber: #6c584cff;
+    --warm-beige: #f5f5dc;
+    --light-cream: #fafaf0;
+    --orange-fruit: #ff6b35;
+    --capybara-beige: #f4e4c1;
+}
+
+.analyzer {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(108, 88, 76, 0.15);
+    border: 1px solid rgba(169, 132, 103, 0.2);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.analyzer h2 {
+    color: var(--umber);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--olivine), var(--chamoisee));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.upload-section {
+    background: linear-gradient(135deg, var(--olivine) 0%, var(--tea-green) 100%);
+    padding: 2.5rem;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--umber);
+    box-shadow: 0 8px 25px rgba(173, 193, 120, 0.3);
+    border: 1px solid rgba(173, 193, 120, 0.3);
+}
+
+.upload-section h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--umber);
+}
+
+.upload-section p {
+    margin: 0 0 2rem 0;
+    opacity: 0.9;
+    font-size: 1rem;
+    color: var(--umber);
+    line-height: 1.5;
+}
+
+.file-input-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--umber);
+    backdrop-filter: blur(10px);
+}
+
+.file-input-label:hover {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(173, 193, 120, 0.3);
+}
+
+.file-input-label.has-file {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: var(--orange-fruit);
+    color: var(--orange-fruit);
+}
+
+.analyze-btn {
+    background: linear-gradient(135deg, var(--orange-fruit) 0%, #e55a2b 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+    font-family: inherit;
+}
+
+.analyze-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 107, 53, 0.4);
+}
+
+.analyze-btn:disabled {
+    background: var(--chamoisee);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.analyze-btn.loading {
+    background: var(--chamoisee);
+    cursor: wait;
+}
+
+.file-info {
+    margin: 1.5rem 0;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    backdrop-filter: blur(10px);
+}
+
+.file-info .file-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--umber);
+}
+
+.file-info .file-size {
+    opacity: 0.8;
+    font-size: 0.85rem;
+    color: var(--umber);
+}
+
+.results {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-left: 4px solid var(--olivine);
+    box-shadow: 0 8px 25px rgba(108, 88, 76, 0.1);
+    border: 1px solid rgba(169, 132, 103, 0.2);
+}
+
+.results h3 {
+    color: var(--umber);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.workout-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(108, 88, 76, 0.08);
+    border: 1px solid rgba(169, 132, 103, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(108, 88, 76, 0.15);
+}
+
+.stat-card .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--olivine);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-label {
+    color: var(--chamoisee);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-issues {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(169, 132, 103, 0.15);
+}
+
+.form-issues h4 {
+    color: var(--orange-fruit);
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.issue-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.issue-list li {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(169, 132, 103, 0.2);
+    color: var(--chamoisee);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.issue-list li:last-child {
+    border-bottom: none;
+}
+
+.issue-list li::before {
+    content: "⚠️";
+    margin-right: 0.8rem;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 0.8rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: rgba(255, 107, 53, 0.1);
+    color: var(--orange-fruit);
+    padding: 1.2rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    text-align: center;
+    font-weight: 500;
+}
+
+.success-message {
+    background: rgba(173, 193, 120, 0.1);
+    color: var(--olivine);
+    padding: 1.2rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    border: 1px solid rgba(173, 193, 120, 0.3);
+    text-align: center;
+    font-weight: 500;
+}
+
+/* How It Works Section */
+.upload-section.how-it-works {
+    background: linear-gradient(135deg, var(--chamoisee) 0%, var(--umber) 100%);
+    color: white;
+    margin-top: 2rem;
+}
+
+.upload-section.how-it-works h3,
+.upload-section.how-it-works p {
+    color: white;
+}
+
+.upload-section.how-it-works ul {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+}
+
+.upload-section.how-it-works li {
+    margin: 0.8rem 0;
+    padding: 0.8rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.form-scores {
+  background: var(--parchment);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-scores h4 {
+  margin: 0 0 15px 0;
+  color: var(--chamoisee);
+  font-size: 1.2em;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: var(--olivine);
+  border-radius: 8px;
+  border: 1px solid var(--orange-fruit);
+}
+
+.score-label {
+  font-weight: 600;
+  color: var(--chamoisee);
+}
+
+.score-value {
+  font-weight: bold;
+  color: var(--orange-fruit);
+  font-size: 1.1em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .analyzer {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: 16px;
+    }
+    
+    .upload-section {
+        padding: 2rem;
+        border-radius: 12px;
+    }
+    
+    .workout-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .analyze-btn {
+        width: 100%;
+        padding: 1.2rem;
+    }
+    
+    .analyzer h2 {
+        font-size: 1.8rem;
+    }
+    
+    .results h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .analyzer {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    .upload-section {
+        padding: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1.2rem;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2rem;
+    }
+}

@@ -5,6 +5,7 @@ import NutritionTracker from './NutritionTracker';
 import Community from './community'; // Ensure file is capitalized if named Community.js
 import Profile from './Profile';
 import AIChatAssistant from './AIChatAssistant';
+import WorkoutAnalyzer from './WorkoutAnalyzer';
 
 function HomeScreen() {
     const { userData } = useUser();
@@ -227,11 +228,7 @@ function HomeScreen() {
                 <h2>🏃 Activity Hub</h2>
                 <p>Monitor your physical activity and fitness progress</p>
             </div>
-            <div className="coming-soon">
-                <div className="coming-soon-icon">🏃</div>
-                <h3>Activity Dashboard</h3>
-                <p>Coming soon - Track your workouts, steps, and fitness goals with personalized insights</p>
-            </div>
+            <WorkoutAnalyzer />
         </div>
     );
 
