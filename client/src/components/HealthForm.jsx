@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import './HealthForm.css';
 
 function HealthForm({ onComplete, userData }) {
@@ -125,11 +127,48 @@ function HealthForm({ onComplete, userData }) {
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
         } else {
-            onComplete(healthData);
+            // Final step - store health data in Firestore
+            try {
+                console.log('Storing health data in Firestore...');
+                console.log('User data:', userData);
+                console.log('Health data:', healthData);
+
+                // Prepare health data for Firestore
+                const healthDataForFirestore = {
+                    ...healthData,
+                    completedAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                // Update user document with health data
+                const userRef = doc(db, 'users', userData.uid);
+                await updateDoc(userRef, {
+                    healthData: healthDataForFirestore,
+                    healthFormComplete: true,
+                    profileComplete: true,
+                    updatedAt: new Date().toISOString()
+                });
+
+                console.log('Health data stored successfully in Firestore');
+
+                // Call onComplete with combined data
+                onComplete({
+                    ...userData,
+                    healthData: healthDataForFirestore
+                });
+
+            } catch (error) {
+                console.error('Error storing health data:', error);
+                // Still call onComplete even if Firestore fails
+                onComplete({
+                    ...userData,
+                    healthData: healthData
+                });
+            }
         }
     };
 

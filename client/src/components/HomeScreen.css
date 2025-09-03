@@ -1340,3 +1340,115 @@
     box-shadow: 0 4px 15px rgba(173, 193, 120, 0.4);
     transform: translateY(-2px);
 }
+
+/* AI Assistant Card Styles */
+.ai-assistant-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 8px 20px rgba(108, 88, 76, 0.1);
+    border: 1px solid rgba(169, 132, 103, 0.2);
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.ai-assistant-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(108, 88, 76, 0.15);
+}
+
+.ai-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ai-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--olivine), var(--tea-green));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+}
+
+.ai-info h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--umber);
+}
+
+.ai-info p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: var(--chamoisee);
+}
+
+.ai-chat-btn {
+    width: 100%;
+    background: var(--olivine);
+    color: var(--umber);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.2);
+}
+
+.ai-chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(173, 193, 120, 0.3);
+}
+
+.ai-arrow {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.ai-chat-btn:hover .ai-arrow {
+    transform: translateX(4px);
+}
+
+/* Mobile responsive for AI card */
+@media (max-width: 768px) {
+    .ai-assistant-card {
+        padding: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .ai-card-header {
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .ai-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .ai-info h4 {
+        font-size: 15px;
+    }
+
+    .ai-info p {
+        font-size: 12px;
+    }
+
+    .ai-chat-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}

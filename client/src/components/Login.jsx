@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import './Login.css';
 
 function Login({ onSwitchToSignup, onComplete }) {
@@ -34,12 +35,32 @@ function Login({ onSwitchToSignup, onComplete }) {
                 formData.password
             );
 
-            console.log('Login successful:', userCredential.user);
+            const user = userCredential.user;
+            console.log('Login successful:', user);
+
+            // Get user data from Firestore
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            let userData = {};
+
+            if (userDoc.exists()) {
+                userData = userDoc.data();
+                console.log('User data from Firestore:', userData);
+
+                // Update last login time
+                await updateDoc(doc(db, 'users', user.uid), {
+                    lastLoginAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+            } else {
+                console.log('User document not found in Firestore');
+            }
+
             // Call onComplete with user data
             if (onComplete) {
                 onComplete({
-                    uid: userCredential.user.uid,
-                    email: userCredential.user.email
+                    uid: user.uid,
+                    email: user.email,
+                    ...userData
                 });
             }
 

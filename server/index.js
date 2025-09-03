@@ -11,6 +11,7 @@ import jsQR from 'jsqr';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -42,14 +43,23 @@ const upload = multer({
 const APP_ID = process.env.APP_ID;
 const APP_KEY = process.env.APP_KEY;
 
+// Gemini AI configuration
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
+
 // Debug environment variables
 console.log('Environment Variables:', {
   APP_ID: APP_ID ? 'Set' : 'Not set',
-  APP_KEY: APP_KEY ? 'Set' : 'Not set'
+  APP_KEY: APP_KEY ? 'Set' : 'Not set',
+  GEMINI_API_KEY: GEMINI_API_KEY ? 'Set' : 'Not set'
 });
 
 if (!APP_ID || !APP_KEY) {
   console.error('Missing Nutritionix API credentials. Please check your .env file');
+}
+
+if (!GEMINI_API_KEY) {
+  console.error('Missing Gemini API key. AI chat assistant will not work. Please check your .env file');
 }
 
 const headers = {
@@ -80,10 +90,10 @@ io.on('connection', (socket) => {
 // Original pet state trigger endpoint
 app.get('/trigger/:state', (req, res) => {
   const state = req.params.state;
-  io.to('demo').emit('pet_update', { 
-    state, 
-    xp: Math.floor(Math.random()*500), 
-    level: Math.floor(Math.random()*10)+1 
+  io.to('demo').emit('pet_update', {
+    state,
+    xp: Math.floor(Math.random() * 500),
+    level: Math.floor(Math.random() * 10) + 1
   });
   res.json({ ok: true, state });
 });
@@ -127,8 +137,8 @@ app.get("/search", async (req, res) => {
     // Check if API credentials are set
     if (!APP_ID || !APP_KEY) {
       console.error('API credentials missing');
-      return res.status(500).json({ 
-        error: "Server configuration error", 
+      return res.status(500).json({
+        error: "Server configuration error",
         message: "API credentials are not configured"
       });
     }
@@ -140,7 +150,7 @@ app.get("/search", async (req, res) => {
 
     console.log('Making search request for:', query);
     const url = "https://trackapi.nutritionix.com/v2/search/instant";
-    
+
     const response = await axios.get(url, {
       headers,
       params: { query }
@@ -159,13 +169,13 @@ app.get("/search", async (req, res) => {
         carbs_g: item.nf_total_carbohydrate || "Get details →",
         fat_g: item.nf_total_fat || "Get details →"
       };
-      
+
       if (branded) {
         entry.brand_name = item.brand_name;
         entry.nix_brand_id = item.nix_brand_id;
         entry.nix_item_id = item.nix_item_id;
       }
-      
+
       return entry;
     };
 
@@ -283,11 +293,11 @@ app.get("/food-complete", async (req, res) => {
     if (quickResults.length > 0) {
       try {
         const nutritionUrl = "https://trackapi.nutritionix.com/v2/natural/nutrients";
-        const nutritionResponse = await axios.post(nutritionUrl, 
-          { query: `1 ${quickResults[0].food_name}` }, 
+        const nutritionResponse = await axios.post(nutritionUrl,
+          { query: `1 ${quickResults[0].food_name}` },
           { headers }
         );
-        
+
         const food = nutritionResponse.data.foods[0];
         detailedNutrition = {
           food_name: food.food_name,
@@ -341,17 +351,17 @@ app.post("/process-image", upload.single('image'), async (req, res) => {
     let image;
     try {
       image = await Jimp.read(req.file.buffer);
-      
+
       // Optimize image for processing
       image.normalize() // Adjust contrast
-           .scaleToFit(1024, 1024) // Resize if too large
-           .greyscale(); // Convert to greyscale for better OCR
-      
+        .scaleToFit(1024, 1024) // Resize if too large
+        .greyscale(); // Convert to greyscale for better OCR
+
     } catch (error) {
       console.error('Image reading error:', error);
       throw new Error('Failed to read image file. Please ensure it\'s a valid image.');
     }
-    
+
     if (type === 'barcode') {
       // Process image for barcode detection
       const imageBuffer = new Uint8ClampedArray(image.bitmap.data.buffer);
@@ -363,7 +373,7 @@ app.post("/process-image", upload.single('image'), async (req, res) => {
 
       // Detect QR/barcode
       const code = jsQR(imageData.data, imageData.width, imageData.height);
-      
+
       if (code) {
         return res.json({
           barcode: code.data,
@@ -399,7 +409,7 @@ app.post("/process-image", upload.single('image'), async (req, res) => {
 
       // Extract nutrition information
       const nutrition = parseNutritionText(text);
-      
+
       if (Object.keys(nutrition).length > 0) {
         return res.json({
           nutrition,
@@ -422,7 +432,7 @@ app.post("/process-image", upload.single('image'), async (req, res) => {
 // Helper function to parse nutrition text
 function parseNutritionText(text) {
   const nutrition = {};
-  
+
   // Common patterns in nutrition labels
   const patterns = {
     calories: /calories[:\s]+(\d+)/i,
@@ -450,9 +460,9 @@ function parseNutritionText(text) {
 app.post("/upload-photos", async (req, res) => {
   try {
     const { upc, frontImage, nutritionImage, ingredientImage } = req.body;
-    
+
     if (!upc || !frontImage || !nutritionImage) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Missing required fields",
         message: "UPC, front package photo, and nutrition label photo are required"
       });
@@ -460,7 +470,7 @@ app.post("/upload-photos", async (req, res) => {
 
     // Validate UPC format
     if (!/^\d{8,14}$/.test(upc)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Invalid UPC format",
         message: "UPC must be 8-14 digits"
       });
@@ -504,7 +514,7 @@ app.post("/upload-photos", async (req, res) => {
 app.get("/barcode/:upc", async (req, res) => {
   try {
     const upc = req.params.upc;
-    
+
     // Validate UPC format (should be numeric and 8+ digits)
     if (!/^\d{8,}$/.test(upc)) {
       return res.status(400).json({ error: "Invalid UPC format. Please provide a valid barcode number." });
@@ -541,16 +551,92 @@ app.get("/barcode/:upc", async (req, res) => {
   } catch (error) {
     console.error(error.response?.data || error.message);
     if (error.response?.status === 404) {
-      res.status(404).json({ 
+      res.status(404).json({
         error: "Product not found",
         message: "This barcode is not in the Nutritionix database. Try searching by product name instead."
       });
     } else {
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to lookup barcode",
         details: error.response?.data?.message || error.message
       });
     }
+  }
+});
+
+// Route 9: Gemini AI Chat Assistant
+app.post("/api/gemini/chat", async (req, res) => {
+  try {
+    const { message, context } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    if (!genAI) {
+      return res.status(503).json({
+        error: "AI service unavailable",
+        message: "Gemini API key is not configured"
+      });
+    }
+
+    // Create a model instance
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Prepare the prompt with context
+    const prompt = `${context || `You are a specialized AI health assistant. You can ONLY answer questions related to:
+           - Health and wellness
+           - Nutrition and diet
+           - Exercise and fitness
+           - Mental health and stress
+           - Sleep and recovery
+           - Medical conditions (general advice only)
+           - Healthy lifestyle tips
+           
+           If someone asks about anything else (politics, technology, entertainment, etc.), politely redirect them back to health topics.
+           
+           Always provide evidence-based, helpful health advice. For serious medical concerns, recommend consulting healthcare professionals.
+           
+           Keep responses friendly, informative, and focused on health and wellness.`}
+
+User: ${message}
+
+Assistant:`;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({
+      response: text,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+
+    // Handle specific Gemini API errors
+    if (error.message.includes('API_KEY_INVALID')) {
+      return res.status(401).json({
+        error: "Invalid API key",
+        message: "Please check your Gemini API key configuration"
+      });
+    }
+
+    if (error.message.includes('QUOTA_EXCEEDED')) {
+      return res.status(429).json({
+        error: "Rate limit exceeded",
+        message: "You've reached the free tier limit. Please wait a moment and try again, or upgrade your plan for higher limits.",
+        retryAfter: "33s"
+      });
+    }
+
+    res.status(500).json({
+      error: "AI service error",
+      message: "Failed to get response from AI assistant",
+      details: error.message
+    });
   }
 });
 
@@ -576,7 +662,8 @@ app.use((req, res) => {
       'GET /food-complete?food=apple',
       'GET /barcode/:upc',
       'GET /health',
-      'GET /trigger/:state'
+      'GET /trigger/:state',
+      'POST /api/gemini/chat'
     ]
   });
 });
@@ -596,6 +683,7 @@ Available endpoints:
 - GET  /trigger/:state            (Pet state updates)
 - POST /process-image             (Process food images)
 - POST /upload-photos             (Upload food photos)
+- POST /api/gemini/chat          (AI Chat Assistant)
 
 🚀 Server is ready to handle requests!
   `);

@@ -1,5 +1,6 @@
 // client/src/App.jsx
 import React, { useState } from 'react';
+import { UserProvider } from './contexts/UserContext';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import HealthForm from './components/HealthForm';
@@ -44,9 +45,11 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {renderCurrentView()}
-    </div>
+    <UserProvider>
+      <div className="App">
+        {renderCurrentView()}
+      </div>
+    </UserProvider>
   );
 }
 

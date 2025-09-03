@@ -99,24 +99,47 @@ function Signup({ onSwitchToLogin, onComplete }) {
             try {
                 console.log('Starting Firebase authentication...');
 
-                // TEMPORARY: For testing the flow, bypass Firebase
-                console.log('TEMPORARY: Bypassing Firebase for testing...');
+                // Create user with Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    formData.email,
+                    formData.password
+                );
 
-                // Simulate successful signup
-                const mockUser = {
-                    uid: 'test-uid-' + Date.now(),
-                    email: formData.email
+                const user = userCredential.user;
+                console.log('Firebase user created:', user);
+
+                // Store user data in Firestore
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    fullName: formData.fullName,
+                    dateOfBirth: formData.dateOfBirth,
+                    weight: parseFloat(formData.weight),
+                    height: parseFloat(formData.height),
+                    medicalConditions: formData.medicalConditions,
+                    shareWithCaregiver: formData.shareWithCaregiver,
+                    caregiverEmail: formData.caregiverEmail,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    profileComplete: false, // Will be set to true after health form
+                    healthFormComplete: false
                 };
 
-                console.log('Mock user created:', mockUser);
+                console.log('Storing user data in Firestore:', userData);
+
+                // Create user document in Firestore
+                await setDoc(doc(db, 'users', user.uid), userData);
+
+                console.log('User data stored successfully in Firestore');
                 console.log('Calling onComplete callback...');
 
                 // Call onComplete with user data
                 if (onComplete) {
                     console.log('onComplete function exists, calling it...');
                     onComplete({
-                        uid: mockUser.uid,
-                        email: mockUser.email,
+                        uid: user.uid,
+                        email: user.email,
                         fullName: formData.fullName,
                         dateOfBirth: formData.dateOfBirth,
                         weight: formData.weight,
@@ -129,8 +152,6 @@ function Signup({ onSwitchToLogin, onComplete }) {
                 } else {
                     console.log('onComplete callback not provided');
                 }
-
-                return; // Exit early for testing
 
 
             } catch (err) {
