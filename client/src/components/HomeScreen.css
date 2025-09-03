@@ -1308,4 +1308,35 @@
 
 .tab-item:hover {
     transform: translateY(-2px);
+
+}
+/* Community Button in Top Navigation */
+.community-btn {
+    background: rgba(173, 193, 120, 0.1);
+    border: 2px solid rgba(173, 193, 120, 0.3);
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    color: var(--olivine);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.community-btn:hover {
+    background: rgba(173, 193, 120, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+}
+
+.community-btn.active {
+    background: var(--olivine);
+    color: var(--umber);
+    border-color: var(--olivine);
+    box-shadow: 0 4px 15px rgba(173, 193, 120, 0.4);
+    transform: translateY(-2px);
 }

@@ -1,0 +1,144 @@
+.community-container {
+  padding: 1rem;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* Create Post Box */
+.create-post {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.create-post textarea {
+  width: 100%;
+  height: 60px;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+  margin-bottom: 0.5rem;
+}
+
+.create-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Hide raw file input */
+input[type="file"] {
+  display: none;
+}
+
+/* Custom file upload button */
+.custom-file-upload {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: #6a994e;
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  background-color: #52734d;
+}
+
+.file-chosen {
+  font-size: 13px;
+  color: #444;
+  margin-right: auto;
+}
+
+/* Post button */
+.post-btn {
+  padding: 8px 16px;
+  background-color: #6a994e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.post-btn:hover {
+  background-color: #52734d;
+}
+
+/* Posts Feed */
+.posts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.post-user {
+  margin: 0;
+  font-weight: bold;
+}
+
+.post-content {
+  margin: 0.5rem 0;
+}
+
+.post-img {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+/* Post Actions */
+.post-actions {
+  margin-top: 0.5rem;
+}
+
+.post-actions button {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.post-actions button:hover {
+  background: #c8e6c9;
+}
+
+/* Comments */
+.comments {
+  margin-top: 0.5rem;
+}
+
+.comment {
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+  color: #444;
+}
+
+.comments input {
+  width: 100%;
+  padding: 0.4rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
