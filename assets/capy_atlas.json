@@ -1,38 +1,13 @@
 {
-  "frame_size": [
-    64,
-    64
-  ],
-  "atlas_size": [
-    512,
-    512
-  ],
+  "frame_size": [64, 64],
+  "atlas_size": [512, 512],
   "columns": 8,
   "animations": {
-    "celebrate": {
-      "start_index": 0,
-      "count": 6,
-      "fps": 6
-    },
-    "eat": {
-      "start_index": 6,
-      "count": 4,
-      "fps": 5
-    },
-    "idle": {
-      "start_index": 10,
-      "count": 4,
-      "fps": 4
-    },
-    "sick": {
-      "start_index": 14,
-      "count": 3,
-      "fps": 3
-    },
-    "walk": {
-      "start_index": 17,
-      "count": 6,
-      "fps": 6
-    }
+    "celebrate": {"start_index": 0, "count": 6, "fps": 2},
+    "eat": {"start_index": 6, "count": 4, "fps": 1},
+    "idle": {"start_index": 10, "count": 4, "fps": 1},
+    "sick": {"start_index": 14, "count": 3, "fps": 1},
+    "walk": {"start_index": 17, "count": 6, "fps": 2}
   }
 }
+

@@ -30,12 +30,14 @@ function buildAtlas() {
       // tweak fps here if you want slower animations
       fps:
         anim === "idle"
-          ? 4
+          ? 2
           : anim === "sick"
-          ? 3
+          ? 2
           : anim === "eat"
-          ? 5
-          : 6,
+          ? 3
+          : anim === "walk"
+          ? 4
+          : 3, // celebrate
     };
     currentIndex += count;
   }

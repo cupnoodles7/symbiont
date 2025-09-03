@@ -1,5 +1,5 @@
 {
-  "name": "capy-project",
+  "name": "symbiont",
   "version": "1.0.0",
   "description": "A virtual pet capybara game with React frontend and Express backend",
   "private": true,
@@ -35,14 +35,14 @@
     "socket.io",
     "nodejs"
   ],
-  "author": "Your Name",
+  "author": "cupnoodles7",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/capy-project.git"
+    "url": "git+https://github.com/cupnoodles7/symbiont.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/capy-project/issues"
+    "url": "https://github.com/cupnoodles7/symbiont/issues"
   },
-  "homepage": "https://github.com/yourusername/capy-project#readme"
+  "homepage": "https://github.com/cupnoodles7/symbiont#readme"
 }
