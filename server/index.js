@@ -1,21 +1,64 @@
 // server/index.js
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const cors = require('cors');
-const { Server } = require('socket.io');
+import express from 'express';
+import http from 'http';
+import path from 'path';
+import cors from 'cors';
+import { Server } from 'socket.io';
+import multer from 'multer';
+import { createWorker } from 'tesseract.js';
+import * as Jimp from 'jimp';
+import jsQR from 'jsqr';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+// ES Module fix for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+app.use(express.json());
+
+// CORS configuration for API access
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'x-app-id', 'x-app-key']
+}));
 
 // serve static files from ../assets
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets'), { maxAge: '30d' }));
 
+// Configure multer for file uploads
+const upload = multer({
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Nutritionix API configuration
+const APP_ID = process.env.APP_ID;
+const APP_KEY = process.env.APP_KEY;
+
+const headers = {
+  "x-app-id": APP_ID,
+  "x-app-key": APP_KEY,
+  "x-remote-user-id": "0"
+};
+
+const PHOTO_API_BASE = 'https://photoapi-qa.nutritionix.com';
+
+// Create HTTP server
 const httpServer = http.createServer(app);
+
+// Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: { origin: '*' }
 });
 
+// Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('client connected', socket.id);
   socket.on('join', (data) => {
@@ -24,11 +67,515 @@ io.on('connection', (socket) => {
   });
 });
 
+// Original pet state trigger endpoint
 app.get('/trigger/:state', (req, res) => {
   const state = req.params.state;
-  io.to('demo').emit('pet_update', { state, xp: Math.floor(Math.random()*500), level: Math.floor(Math.random()*10)+1 });
+  io.to('demo').emit('pet_update', { 
+    state, 
+    xp: Math.floor(Math.random()*500), 
+    level: Math.floor(Math.random()*10)+1 
+  });
   res.json({ ok: true, state });
 });
 
+// Route 1: API Info
+app.get('/', (req, res) => {
+  res.json({
+    name: "Food Nutrition API",
+    version: "1.0.0",
+    endpoints: {
+      search: "GET /search?food=apple",
+      nutrition: "POST /nutrition with {\"query\": \"1 apple\"}",
+      complete: "GET /food-complete?food=apple",
+      processImage: "POST /process-image (multipart form with image and type)",
+      uploadPhotos: "POST /upload-photos (multipart form with images)",
+      petTrigger: "GET /trigger/:state (pet state updates)"
+    },
+    documentation: "See README.md for detailed API documentation"
+  });
+});
+
+// Route 2: Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      search: "GET /search?food=apple",
+      nutrition: "POST /nutrition with {\"query\": \"1 apple\"}",
+      complete: "GET /food-complete?food=apple",
+      barcode: "GET /barcode/012000161155",
+      scanner: "GET / (HTML scanner interface)",
+      petTrigger: "GET /trigger/:state"
+    }
+  });
+});
+
+// Route 3: Search for foods (quick search with limited data)
+app.get("/search", async (req, res) => {
+  try {
+    const query = req.query.food;
+    if (!query) {
+      return res.status(400).json({ error: "Please provide a food query (?food=...)" });
+    }
+
+    const url = "https://trackapi.nutritionix.com/v2/search/instant";
+    const response = await axios.get(url, {
+      headers,
+      params: { query }
+    });
+
+    const data = response.data;
+    const results = [];
+
+    const parseSearchItem = (item, branded = false) => {
+      const entry = {
+        food_name: item.food_name,
+        serving_qty: item.serving_qty,
+        serving_unit: item.serving_unit,
+        calories: item.nf_calories || "Unknown",
+        protein_g: item.nf_protein || "Get details →",
+        carbs_g: item.nf_total_carbohydrate || "Get details →",
+        fat_g: item.nf_total_fat || "Get details →"
+      };
+      
+      if (branded) {
+        entry.brand_name = item.brand_name;
+        entry.nix_brand_id = item.nix_brand_id;
+        entry.nix_item_id = item.nix_item_id;
+      }
+      
+      return entry;
+    };
+
+    // Common foods
+    if (data.common) {
+      data.common.forEach(item => {
+        results.push({ ...parseSearchItem(item), type: "common" });
+      });
+    }
+
+    // Branded foods
+    if (data.branded) {
+      data.branded.forEach(item => {
+        results.push({ ...parseSearchItem(item, true), type: "branded" });
+      });
+    }
+
+    res.json({
+      query,
+      total_results: results.length,
+      message: "Use /nutrition endpoint to get full macros for specific foods",
+      results
+    });
+
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to search foods" });
+  }
+});
+
+// Route 4: Get detailed nutrition info (full macros)
+app.post("/nutrition", async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query) {
+      return res.status(400).json({ error: "Please provide a food query" });
+    }
+
+    const url = "https://trackapi.nutritionix.com/v2/natural/nutrients";
+    const headers = {
+      "x-app-id": APP_ID,
+      "x-app-key": APP_KEY,
+      "x-remote-user-id": "0",
+      "Content-Type": "application/json"
+    };
+
+    const response = await axios.post(url, { query }, { headers });
+
+    const nutrients = response.data.foods.map(item => ({
+      food_name: item.food_name,
+      brand_name: item.brand_name || null,
+      calories: item.nf_calories,
+      protein: item.nf_protein,
+      total_fat: item.nf_total_fat,
+      carbohydrates: item.nf_total_carbohydrate,
+      fiber: item.nf_dietary_fiber,
+      sugar: item.nf_sugars,
+      serving_qty: item.serving_qty,
+      serving_unit: item.serving_unit,
+      serving_weight_grams: item.serving_weight_grams
+    }));
+
+    res.json({ results: nutrients });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch nutrition data" });
+  }
+});
+
+// Route 5: Combined search and nutrition (best of both)
+app.get("/food-complete", async (req, res) => {
+  try {
+    const query = req.query.food;
+    if (!query) {
+      return res.status(400).json({ error: "Please provide a food query (?food=...)" });
+    }
+
+    // First, do a quick search
+    const searchUrl = "https://trackapi.nutritionix.com/v2/search/instant";
+    const searchResponse = await axios.get(searchUrl, {
+      headers,
+      params: { query }
+    });
+
+    const searchData = searchResponse.data;
+    const quickResults = [];
+
+    // Parse common foods for quick display
+    if (searchData.common) {
+      searchData.common.forEach(item => {
+        quickResults.push({
+          food_name: item.food_name,
+          serving_qty: item.serving_qty,
+          serving_unit: item.serving_unit,
+          type: "common"
+        });
+      });
+    }
+
+    // Parse branded foods for quick display
+    if (searchData.branded) {
+      searchData.branded.slice(0, 5).forEach(item => { // Limit to 5 branded items
+        quickResults.push({
+          food_name: item.food_name,
+          brand_name: item.brand_name,
+          serving_qty: item.serving_qty,
+          serving_unit: item.serving_unit,
+          type: "branded"
+        });
+      });
+    }
+
+    // Then get detailed nutrition for the first/most relevant result
+    let detailedNutrition = null;
+    if (quickResults.length > 0) {
+      try {
+        const nutritionUrl = "https://trackapi.nutritionix.com/v2/natural/nutrients";
+        const nutritionResponse = await axios.post(nutritionUrl, 
+          { query: `1 ${quickResults[0].food_name}` }, 
+          { headers }
+        );
+        
+        const food = nutritionResponse.data.foods[0];
+        detailedNutrition = {
+          food_name: food.food_name,
+          serving_qty: food.serving_qty,
+          serving_unit: food.serving_unit,
+          calories: food.nf_calories,
+          protein: food.nf_protein,
+          carbohydrates: food.nf_total_carbohydrate,
+          fat: food.nf_total_fat,
+          fiber: food.nf_dietary_fiber,
+          sugar: food.nf_sugars,
+          sodium: food.nf_sodium
+        };
+      } catch (nutritionError) {
+        console.log("Could not get detailed nutrition for:", quickResults[0].food_name);
+      }
+    }
+
+    res.json({
+      query,
+      search_results: quickResults,
+      featured_nutrition: detailedNutrition,
+      message: "Use POST /nutrition with specific food name to get full details"
+    });
+
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to get food data" });
+  }
+});
+
+// Route 6: Process uploaded images (barcode/nutrition)
+app.post("/process-image", upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: "No image provided",
+        message: "Please upload an image file"
+      });
+    }
+
+    const type = req.body.type;
+    if (!['barcode', 'nutrition'].includes(type)) {
+      return res.status(400).json({
+        error: "Invalid type",
+        message: "Type must be either 'barcode' or 'nutrition'"
+      });
+    }
+
+    // Read and process the image file
+    let image;
+    try {
+      image = await Jimp.read(req.file.buffer);
+      
+      // Optimize image for processing
+      image.normalize() // Adjust contrast
+           .scaleToFit(1024, 1024) // Resize if too large
+           .greyscale(); // Convert to greyscale for better OCR
+      
+    } catch (error) {
+      console.error('Image reading error:', error);
+      throw new Error('Failed to read image file. Please ensure it\'s a valid image.');
+    }
+    
+    if (type === 'barcode') {
+      // Process image for barcode detection
+      const imageBuffer = new Uint8ClampedArray(image.bitmap.data.buffer);
+      const imageData = {
+        data: imageBuffer,
+        width: image.bitmap.width,
+        height: image.bitmap.height
+      };
+
+      // Detect QR/barcode
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      
+      if (code) {
+        return res.json({
+          barcode: code.data,
+          message: "Barcode detected successfully"
+        });
+      }
+
+      // If jsQR fails, try OCR as fallback for clear barcode numbers
+      const worker = await createWorker();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
+      const { data: { text } } = await worker.recognize(req.file.buffer);
+      await worker.terminate();
+
+      // Extract numbers from OCR result
+      const numbers = text.match(/\d{8,14}/);
+      if (numbers) {
+        return res.json({
+          barcode: numbers[0],
+          message: "Barcode detected via OCR"
+        });
+      }
+
+      throw new Error("No barcode detected in image");
+
+    } else {
+      // Process nutrition label with OCR
+      const worker = await createWorker();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
+      const { data: { text } } = await worker.recognize(req.file.buffer);
+      await worker.terminate();
+
+      // Extract nutrition information
+      const nutrition = parseNutritionText(text);
+      
+      if (Object.keys(nutrition).length > 0) {
+        return res.json({
+          nutrition,
+          message: "Nutrition information extracted successfully"
+        });
+      }
+
+      throw new Error("Could not extract nutrition information from image");
+    }
+
+  } catch (error) {
+    console.error('Image processing error:', error);
+    res.status(400).json({
+      error: "Processing failed",
+      message: error.message
+    });
+  }
+});
+
+// Helper function to parse nutrition text
+function parseNutritionText(text) {
+  const nutrition = {};
+  
+  // Common patterns in nutrition labels
+  const patterns = {
+    calories: /calories[:\s]+(\d+)/i,
+    protein: /protein[:\s]+(\d+)g/i,
+    carbohydrates: /(?:total\s+)?carbohydrates?[:\s]+(\d+)g/i,
+    fat: /(?:total\s+)?fat[:\s]+(\d+)g/i,
+    sugar: /sugars?[:\s]+(\d+)g/i,
+    fiber: /(?:dietary\s+)?fiber[:\s]+(\d+)g/i,
+    sodium: /sodium[:\s]+(\d+)mg/i,
+    servingSize: /serving\s+size[:\s]+([^\\n]+)/i
+  };
+
+  // Extract values using patterns
+  for (const [key, pattern] of Object.entries(patterns)) {
+    const match = text.match(pattern);
+    if (match) {
+      nutrition[key] = key === 'servingSize' ? match[1].trim() : Number(match[1]);
+    }
+  }
+
+  return nutrition;
+}
+
+// Route 7: Photo upload endpoint
+app.post("/upload-photos", async (req, res) => {
+  try {
+    const { upc, frontImage, nutritionImage, ingredientImage } = req.body;
+    
+    if (!upc || !frontImage || !nutritionImage) {
+      return res.status(400).json({ 
+        error: "Missing required fields",
+        message: "UPC, front package photo, and nutrition label photo are required"
+      });
+    }
+
+    // Validate UPC format
+    if (!/^\d{8,14}$/.test(upc)) {
+      return res.status(400).json({ 
+        error: "Invalid UPC format",
+        message: "UPC must be 8-14 digits"
+      });
+    }
+
+    // Make request to Nutritionix Photo API
+    const formData = new FormData();
+    formData.append('UPC', upc);
+    formData.append('frontOfPackage', frontImage);
+    formData.append('nutritionLabel', nutritionImage);
+    if (ingredientImage) {
+      formData.append('ingredientStatement', ingredientImage);
+    }
+
+    const response = await axios.post(`${PHOTO_API_BASE}/upload`, formData, {
+      headers: {
+        ...headers,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    res.json(response.data);
+
+  } catch (error) {
+    console.error('Photo upload error:', error.response?.data || error.message);
+    if (error.response?.status === 413) {
+      res.status(413).json({
+        error: "Image too large",
+        message: "One or more images exceed the size limit (5MB per image)"
+      });
+    } else {
+      res.status(error.response?.status || 500).json({
+        error: "Upload failed",
+        message: error.response?.data?.message || "Failed to upload photos"
+      });
+    }
+  }
+});
+
+// Route 8: Barcode-specific lookup endpoint
+app.get("/barcode/:upc", async (req, res) => {
+  try {
+    const upc = req.params.upc;
+    
+    // Validate UPC format (should be numeric and 8+ digits)
+    if (!/^\d{8,}$/.test(upc)) {
+      return res.status(400).json({ error: "Invalid UPC format. Please provide a valid barcode number." });
+    }
+
+    const url = `https://trackapi.nutritionix.com/v2/search/item?upc=${upc}`;
+    const response = await axios.get(url, { headers });
+
+    const food = response.data.foods[0];
+    const result = {
+      food_name: food.food_name,
+      brand_name: food.brand_name,
+      serving_qty: food.serving_qty,
+      serving_unit: food.serving_unit,
+      serving_weight_grams: food.serving_weight_grams,
+      calories: food.nf_calories,
+      total_fat: food.nf_total_fat,
+      saturated_fat: food.nf_saturated_fat,
+      cholesterol: food.nf_cholesterol,
+      sodium: food.nf_sodium,
+      total_carbohydrate: food.nf_total_carbohydrate,
+      dietary_fiber: food.nf_dietary_fiber,
+      sugars: food.nf_sugars,
+      protein: food.nf_protein,
+      potassium: food.nf_potassium,
+      photo: food.photo
+    };
+
+    res.json({
+      upc,
+      result
+    });
+
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      res.status(404).json({ 
+        error: "Product not found",
+        message: "This barcode is not in the Nutritionix database. Try searching by product name instead."
+      });
+    } else {
+      res.status(500).json({ 
+        error: "Failed to lookup barcode",
+        details: error.response?.data?.message || error.message
+      });
+    }
+  }
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Unhandled error:', error);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: 'Something went wrong on the server'
+  });
+});
+
+// 404 handler - must be the last route
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Endpoint not found',
+    method: req.method,
+    path: req.path,
+    availableEndpoints: [
+      'GET /',
+      'GET /search?food=apple',
+      'POST /nutrition',
+      'GET /food-complete?food=apple',
+      'GET /barcode/:upc',
+      'GET /health',
+      'GET /trigger/:state'
+    ]
+  });
+});
+
+// Start server
 const PORT = process.env.PORT || 4000;
-httpServer.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+httpServer.listen(PORT, () => {
+  console.log(`🍎 Food Tracker API running on http://localhost:${PORT}`);
+  console.log(`
+Available endpoints:
+- GET  /                           (API Info)
+- GET  /search?food=apple          (Quick search, limited data)
+- POST /nutrition                  (Full macros, send {"query": "1 apple"} or {"query": "012000161155"})
+- GET  /food-complete?food=apple   (Combined search + nutrition)
+- GET  /barcode/012000161155      (Direct barcode lookup)
+- GET  /health                     (API health check)
+- GET  /trigger/:state            (Pet state updates)
+- POST /process-image             (Process food images)
+- POST /upload-photos             (Upload food photos)
+
+🚀 Server is ready to handle requests!
+  `);
+});

@@ -49,5 +49,24 @@ capy_project/
 
 - Node.js 18.0.0+
 - npm 8.0.0+
+- Nutritionix API credentials (for food tracking features)
+
+### Environment Variables
+
+The server requires the following environment variables to be set in `server/.env`:
+
+```
+# Server Configuration
+PORT=4000
+
+# CORS Configuration
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+
+# Nutritionix API Credentials
+APP_ID=your_nutritionix_app_id_here
+APP_KEY=your_nutritionix_api_key_here
+```
+
+You can obtain Nutritionix API credentials by signing up at [https://www.nutritionix.com/business/api](https://www.nutritionix.com/business/api).
 
 For detailed setup instructions and troubleshooting, see the documentation in the `requirements/` folder.
