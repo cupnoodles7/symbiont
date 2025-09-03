@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useUser } from '../contexts/UserContext';
 import './AIChatAssistant.css';
 
 function AIChatAssistant({ onClose }) {
+    const { userData } = useUser();
     const [messages, setMessages] = useState([
         {
             id: 1,
             type: 'ai',
-            content: "Hi there! 👋 I'm your AI health companion. I can help you with nutrition tips, workout plans, wellness advice, and answer any health questions you have. What would you like to know?",
+            content: userData?.fullName
+                ? `Hi ${userData.fullName}! 👋 I'm your personalized AI health assistant. I know your health profile and can provide tailored advice for your specific needs. What would you like to know?`
+                : "Hi! 👋 I'm your AI health assistant. I can help with quick nutrition tips, exercise advice, and wellness questions. What would you like to know?",
             timestamp: new Date()
         }
     ]);
@@ -30,6 +34,81 @@ function AIChatAssistant({ onClose }) {
         }
     }, [isMinimized]);
 
+    // Function to build personalized context based on user data
+    const buildPersonalizedContext = () => {
+        if (!userData) {
+            return `You are a specialized AI health assistant. Provide CONCISE, TO-THE-POINT health advice in 2-3 sentences maximum. Focus on:
+            - Quick, actionable health tips
+            - Brief nutrition advice
+            - Simple exercise suggestions
+            - Short wellness tips
+            
+            Keep responses friendly but brief. Avoid long explanations. If someone asks about non-health topics, politely redirect to health.
+            
+            For serious medical concerns, recommend consulting healthcare professionals.
+            
+            Format: Give direct, brief answers with 1-2 key points only.`;
+        }
+
+        const healthData = userData.healthData || {};
+        const personalInfo = {
+            name: userData.fullName || 'User',
+            age: healthData.age || 'unknown',
+            gender: healthData.gender || 'unknown',
+            weight: healthData.weight || 'unknown',
+            height: healthData.height || 'unknown',
+            activityLevel: healthData.activityLevel || 'unknown',
+            dietaryRestrictions: healthData.dietaryRestrictions || [],
+            healthGoals: healthData.healthGoals || [],
+            medicalConditions: healthData.medicalConditions || [],
+            allergies: healthData.allergies || [],
+            medications: healthData.medications || [],
+            fitnessLevel: healthData.fitnessLevel || 'unknown',
+            sleepQuality: healthData.sleepQuality || 'unknown',
+            stressLevel: healthData.stressLevel || 'unknown',
+            smokingStatus: healthData.smokingStatus || 'unknown',
+            alcoholConsumption: healthData.alcoholConsumption || 'unknown',
+            familyHistory: healthData.familyHistory || [],
+            emergencyContact: healthData.emergencyContact || {}
+        };
+
+        return `You are a specialized AI health assistant for ${personalInfo.name}. Provide CONCISE, TO-THE-POINT health advice in 2-3 sentences maximum.
+
+        USER PROFILE:
+        - Age: ${personalInfo.age}
+        - Gender: ${personalInfo.gender}
+        - Weight: ${personalInfo.weight} kg
+        - Height: ${personalInfo.height} cm
+        - Activity Level: ${personalInfo.activityLevel}
+        - Fitness Level: ${personalInfo.fitnessLevel}
+        - Sleep Quality: ${personalInfo.sleepQuality}
+        - Stress Level: ${personalInfo.stressLevel}
+        - Smoking: ${personalInfo.smokingStatus}
+        - Alcohol: ${personalInfo.alcoholConsumption}
+
+        DIETARY PREFERENCES:
+        - Restrictions: ${personalInfo.dietaryRestrictions.join(', ') || 'None'}
+        - Allergies: ${personalInfo.allergies.join(', ') || 'None'}
+
+        HEALTH GOALS:
+        - ${personalInfo.healthGoals.join(', ') || 'General wellness'}
+
+        MEDICAL CONSIDERATIONS:
+        - Conditions: ${personalInfo.medicalConditions.join(', ') || 'None'}
+        - Medications: ${personalInfo.medications.join(', ') || 'None'}
+        - Family History: ${personalInfo.familyHistory.join(', ') || 'None'}
+
+        INSTRUCTIONS:
+        - Use this personal health data to provide tailored, relevant advice
+        - Consider their specific health goals, restrictions, and conditions
+        - Keep responses brief (2-3 sentences max) and actionable
+        - Focus on their specific needs based on their profile
+        - For serious medical concerns, recommend consulting healthcare professionals
+        - Be encouraging and supportive while being practical
+
+        Format: Give personalized, direct answers that consider their specific health profile.`;
+    };
+
     const sendMessage = async () => {
         if (!inputMessage.trim() || isLoading) return;
 
@@ -52,20 +131,7 @@ function AIChatAssistant({ onClose }) {
                 },
                 body: JSON.stringify({
                     message: inputMessage,
-                    context: `You are a specialized AI health assistant. You can ONLY answer questions related to:
-                    - Health and wellness
-                    - Nutrition and diet
-                    - Exercise and fitness
-                    - Mental health and stress
-                    - Sleep and recovery
-                    - Medical conditions (general advice only)
-                    - Healthy lifestyle tips
-                    
-                    If someone asks about anything else (politics, technology, entertainment, etc.), politely redirect them back to health topics.
-                    
-                    Always provide evidence-based, helpful health advice. For serious medical concerns, recommend consulting healthcare professionals.
-                    
-                    Keep responses friendly, informative, and focused on health and wellness.`
+                    context: buildPersonalizedContext()
                 })
             });
 
@@ -115,10 +181,10 @@ function AIChatAssistant({ onClose }) {
     };
 
     const quickQuestions = [
-        "What should I eat for breakfast?",
-        "How can I improve my sleep?",
-        "What exercises should I do?",
-        "How much water should I drink?"
+        userData?.healthData?.healthGoals?.includes('Weight Loss') ? "Weight loss tips for me?" : "Quick breakfast ideas?",
+        userData?.healthData?.sleepQuality === 'Poor' ? "How to improve my sleep?" : "How to sleep better?",
+        userData?.healthData?.fitnessLevel === 'Beginner' ? "Simple exercises for beginners?" : "Simple exercises?",
+        userData?.healthData?.healthGoals?.includes('Muscle Building') ? "Protein-rich meal ideas?" : "Daily water intake?"
     ];
 
     const handleQuickQuestion = (question) => {

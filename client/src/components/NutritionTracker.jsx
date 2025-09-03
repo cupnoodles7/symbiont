@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './NutritionTracker.css';
 
 function NutritionTracker() {
@@ -19,32 +19,36 @@ function NutritionTracker() {
     const [mealHistory, setMealHistory] = useState([]);
     const [netCalories, setNetCalories] = useState(0); // Calories consumed - burned
 
+    // Refs for scrolling
+    const searchResultsRef = useRef(null);
+    const nutritionDetailsRef = useRef(null);
+
     // Load saved data when component mounts
     useEffect(() => {
         const savedMeals = localStorage.getItem('mealHistory');
         if (savedMeals) {
             const meals = JSON.parse(savedMeals);
             setMealHistory(meals);
-            
+
             // Calculate daily and weekly calories
             const today = new Date().toISOString().split('T')[0];
             const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            
+
             const dailyTotal = meals
                 .filter(meal => meal.date === today)
                 .reduce((sum, meal) => sum + meal.food.calories, 0);
-            
+
             const weeklyTotal = meals
                 .filter(meal => meal.date >= weekAgo && meal.date <= today)
                 .reduce((sum, meal) => sum + meal.food.calories, 0);
-            
+
             setDailyCalories(dailyTotal);
             setWeeklyCalories(weeklyTotal);
-            
+
             // Calculate net calories (assuming no exercise for now)
             setNetCalories(dailyTotal);
         }
-        
+
         // Load saved goal
         const savedGoal = localStorage.getItem('dailyCalorieGoal');
         if (savedGoal) {
@@ -97,7 +101,6 @@ function NutritionTracker() {
         setLoading(true);
         setError(null);
 
-
         try {
             const response = await fetch(`http://localhost:4000/search?food=${encodeURIComponent(searchQuery)}`);
             const data = await response.json();
@@ -107,6 +110,16 @@ function NutritionTracker() {
             }
 
             setSearchResults(data.results || []);
+
+            // Auto-scroll to search results after a short delay
+            setTimeout(() => {
+                if (searchResultsRef.current) {
+                    searchResultsRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 300);
         } catch (err) {
             setError('Failed to search foods. Please try again.');
             console.error('Search error:', err);
@@ -136,6 +149,16 @@ function NutritionTracker() {
             }
 
             setSelectedFood(data.results[0]);
+
+            // Auto-scroll to nutrition details after a short delay
+            setTimeout(() => {
+                if (nutritionDetailsRef.current) {
+                    nutritionDetailsRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 300);
         } catch (err) {
             setError('Failed to get nutrition information. Please try again.');
             console.error('Nutrition error:', err);
@@ -182,7 +205,7 @@ function NutritionTracker() {
             } else {
                 calculateWeeklyCalories();
             }
-            
+
             setLogSuccess(true);
             setSuccessMessage(`Food logged successfully! +${foodData.food.calories} calories added to ${viewMode === 'daily' ? "today's" : "this week's"} total.`);
             setTimeout(() => setLogSuccess(false), 3000);
@@ -211,7 +234,7 @@ function NutritionTracker() {
                         <h2>📊 {viewMode === 'daily' ? "Today's" : "This Week's"} Nutrition Summary</h2>
                         <div className="header-controls">
                             <div className="view-toggle">
-                                <button 
+                                <button
                                     className={`toggle-btn ${viewMode === 'daily' ? 'active' : ''}`}
                                     onClick={() => {
                                         setViewMode('daily');
@@ -220,7 +243,7 @@ function NutritionTracker() {
                                 >
                                     Daily
                                 </button>
-                                <button 
+                                <button
                                     className={`toggle-btn ${viewMode === 'weekly' ? 'active' : ''}`}
                                     onClick={() => {
                                         setViewMode('weekly');
@@ -230,7 +253,7 @@ function NutritionTracker() {
                                     Weekly
                                 </button>
                             </div>
-                            <button 
+                            <button
                                 className="goal-edit-btn"
                                 onClick={() => setEditingGoal(!editingGoal)}
                                 title="Edit daily calorie goal"
@@ -240,17 +263,17 @@ function NutritionTracker() {
                         </div>
                     </div>
                     <div className="date-display">
-                        {viewMode === 'daily' 
-                            ? new Date().toLocaleDateString('en-US', { 
-                                weekday: 'long', 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
+                        {viewMode === 'daily'
+                            ? new Date().toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
                             })
                             : `${new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
                         }
                     </div>
-                    
+
                     {editingGoal && (
                         <div className="goal-editor">
                             <div className="goal-input-group">
@@ -266,13 +289,13 @@ function NutritionTracker() {
                                     className="goal-input"
                                 />
                                 <div className="goal-actions">
-                                    <button 
+                                    <button
                                         className="goal-save-btn"
                                         onClick={saveUserGoal}
                                     >
                                         Save
                                     </button>
-                                    <button 
+                                    <button
                                         className="goal-cancel-btn"
                                         onClick={() => {
                                             setEditingGoal(false);
@@ -283,7 +306,7 @@ function NutritionTracker() {
                                     </button>
                                 </div>
                             </div>
-                            
+
                             {goalSuccess && (
                                 <div className="success-message">
                                     {successMessage}
@@ -292,7 +315,7 @@ function NutritionTracker() {
                         </div>
                     )}
                 </div>
-                
+
                 <div className="calorie-overview">
                     <div className="calorie-main">
                         <div className="calorie-display">
@@ -303,11 +326,11 @@ function NutritionTracker() {
                             of {currentGoal} {viewMode === 'daily' ? 'daily' : 'weekly'} goal
                         </div>
                     </div>
-                    
+
                     <div className="calorie-progress">
                         <div className="progress-bar">
-                            <div 
-                                className="progress-fill" 
+                            <div
+                                className="progress-fill"
                                 style={{ width: `${progressPercentage}%` }}
                             ></div>
                         </div>
@@ -315,7 +338,7 @@ function NutritionTracker() {
                             {progressPercentage.toFixed(1)}% of {viewMode === 'daily' ? 'daily' : 'weekly'} goal
                         </div>
                     </div>
-                    
+
                     <div className="calorie-stats">
                         <div className="calorie-remaining">
                             <span className="remaining-label">Remaining:</span>
@@ -323,7 +346,7 @@ function NutritionTracker() {
                         </div>
                         <div className="net-calories">
                             <span className="net-label">Net Calories:</span>
-                            <span className="net-value" style={{ 
+                            <span className="net-value" style={{
                                 color: netCalories > dailyGoal ? 'var(--error-color, #dc3545)' : 'var(--success-color, #28a745)'
                             }}>
                                 {netCalories} calories
@@ -350,50 +373,38 @@ function NutritionTracker() {
 
                 {error && <div className="error-message">{error}</div>}
 
-                {/* Grid layout search results with internal scroll */}
+                {/* Ultra-minimal list layout search results */}
                 {searchResults.length > 0 && (
-                    <div className="search-results-container">
+                    <div className="search-results-container" ref={searchResultsRef}>
                         <h3>Search Results ({searchResults.length} found)</h3>
-                        
+
                         <div className="results-viewport">
-                            <div className="results-grid">
-                                                                 {searchResults.map((food, index) => (
-                                     <div 
-                                         key={index} 
-                                         className="results-grid-food-item" 
-                                         onClick={() => handleGetNutrition(food.food_name)}
-                                     >
-                                        <div className="food-item-header">
-                                            <h4>{food.food_name}</h4>
-                                            {food.brand_name && <span className="brand-name">{food.brand_name}</span>}
-                                        </div>
-                                        <div className="food-item-details">
-                                            <span>
-                                                {food.serving_qty} {food.serving_unit}
-                                            </span>
-                                            <span>
-                                                {food.calories} cal
-                                            </span>
+                            <div className="results-list">
+                                {searchResults.map((food, index) => (
+                                    <div
+                                        key={index}
+                                        className="results-list-food-item"
+                                        onClick={() => handleGetNutrition(food.food_name)}
+                                    >
+                                        <div className="food-item-info">
+                                            <h4 className="food-name">{food.food_name}</h4>
+                                            <div className="food-servings">
+                                                {food.serving_qty} {food.serving_unit} • {food.calories} cal
+                                            </div>
                                         </div>
                                         <div className="food-item-macros">
-                                            <div className="macro-item">
-                                                <span className="macro-value">{food.protein_g}</span>
-                                                <span className="macro-label">Protein</span>
-                                            </div>
-                                            <div className="macro-item">
-                                                <span className="macro-value">{food.carbs_g}</span>
-                                                <span className="macro-label">Carbs</span>
-                                            </div>
-                                            <div className="macro-item">
-                                                <span className="macro-value">{food.fat_g}</span>
-                                                <span className="macro-label">Fat</span>
-                                            </div>
+                                            <span className="macro-text">P: {food.protein_g}g</span>
+                                            <span className="macro-text">C: {food.carbs_g}g</span>
+                                            <span className="macro-text">F: {food.fat_g}g</span>
                                         </div>
+                                        <button className="view-details-btn">
+                                            View
+                                        </button>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div className="pagination-info">
                             {searchResults.length} results found
                         </div>
@@ -402,7 +413,7 @@ function NutritionTracker() {
             </div>
 
             {selectedFood && (
-                <div className="nutrition-details">
+                <div className="nutrition-details" ref={nutritionDetailsRef}>
                     <h2>📊 Nutrition Facts</h2>
                     <div className="nutrition-card">
                         <div className="nutrition-header">
@@ -454,7 +465,7 @@ function NutritionTracker() {
                                 {successMessage}
                             </div>
                         )}
-                        <button 
+                        <button
                             className="log-food-button"
                             disabled={loading}
                             onClick={handleLogFood}

@@ -68,7 +68,7 @@ function HomeScreen() {
                             <span className="longest-streak">Longest: 14 days</span>
                         </div>
                     </div>
-                    
+
                     <div className="medicine-calendar">
                         {Array.from({ length: 30 }, (_, i) => {
                             const date = new Date();
@@ -77,10 +77,10 @@ function HomeScreen() {
                             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
                             const skipDays = [5, 12]; // Randomly missed on 5th and 12th day
                             const taken = !isWeekend && !skipDays.includes(i);
-                            
+
                             return (
-                                <div 
-                                    key={i} 
+                                <div
+                                    key={i}
                                     className={`calendar-day ${taken ? 'taken' : 'missed'}`}
                                     title={`${date.toLocaleDateString()}: ${taken ? 'Taken' : 'Missed'}`}
                                 >
@@ -118,24 +118,6 @@ function HomeScreen() {
                         Mark Today's Medicines as Taken ✓
                     </button>
                 </div>
-
-                {/* AI Assistant Card */}
-                <div className="ai-assistant-card">
-                    <div className="ai-card-header">
-                        <div className="ai-icon">🤖</div>
-                        <div className="ai-info">
-                            <h4>AI Health Assistant</h4>
-                            <p>Get personalized health advice</p>
-                        </div>
-                    </div>
-                    <button
-                        className="ai-chat-btn"
-                        onClick={() => setShowAIChat(true)}
-                    >
-                        <span>💬 Start Chat</span>
-                        <span className="ai-arrow">→</span>
-                    </button>
-                </div>
             </div>
 
             {/* Center Content - Capybara */}
@@ -169,6 +151,23 @@ function HomeScreen() {
                             💝 Pet
                         </button>
                     </div>
+                </div>
+
+                {/* AI Chat Button */}
+                <div className="ai-chat-button-container">
+                    <button
+                        className="ai-chat-button"
+                        onClick={() => setShowAIChat(true)}
+                    >
+                        <div className="ai-button-content">
+                            <div className="ai-button-icon">🤖</div>
+                            <div className="ai-button-text">
+                                <span className="ai-button-title">AI Health Assistant</span>
+                                <span className="ai-button-subtitle">Get personalized health advice</span>
+                            </div>
+                        </div>
+                        <div className="ai-button-arrow">→</div>
+                    </button>
                 </div>
             </div>
 
