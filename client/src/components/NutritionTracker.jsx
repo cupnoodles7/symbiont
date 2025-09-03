@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './NutritionTracker.css';
-import { db, auth } from '../firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 function NutritionTracker() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -10,6 +8,86 @@ function NutritionTracker() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [logSuccess, setLogSuccess] = useState(false);
+    const [goalSuccess, setGoalSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [dailyCalories, setDailyCalories] = useState(0);
+    const [weeklyCalories, setWeeklyCalories] = useState(0);
+    const [dailyGoal, setDailyGoal] = useState(2000); // Default daily calorie goal
+    const [editingGoal, setEditingGoal] = useState(false);
+    const [tempGoal, setTempGoal] = useState(2000);
+    const [viewMode, setViewMode] = useState('daily'); // 'daily' or 'weekly'
+    const [mealHistory, setMealHistory] = useState([]);
+    const [netCalories, setNetCalories] = useState(0); // Calories consumed - burned
+
+    // Load saved data when component mounts
+    useEffect(() => {
+        const savedMeals = localStorage.getItem('mealHistory');
+        if (savedMeals) {
+            const meals = JSON.parse(savedMeals);
+            setMealHistory(meals);
+            
+            // Calculate daily and weekly calories
+            const today = new Date().toISOString().split('T')[0];
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            const dailyTotal = meals
+                .filter(meal => meal.date === today)
+                .reduce((sum, meal) => sum + meal.food.calories, 0);
+            
+            const weeklyTotal = meals
+                .filter(meal => meal.date >= weekAgo && meal.date <= today)
+                .reduce((sum, meal) => sum + meal.food.calories, 0);
+            
+            setDailyCalories(dailyTotal);
+            setWeeklyCalories(weeklyTotal);
+            
+            // Calculate net calories (assuming no exercise for now)
+            setNetCalories(dailyTotal);
+        }
+        
+        // Load saved goal
+        const savedGoal = localStorage.getItem('dailyCalorieGoal');
+        if (savedGoal) {
+            const goal = parseInt(savedGoal);
+            setDailyGoal(goal);
+            setTempGoal(goal);
+        }
+    }, []);
+
+    // Function to save user's daily calorie goal
+    const saveUserGoal = () => {
+        try {
+            localStorage.setItem('dailyCalorieGoal', tempGoal.toString());
+            setDailyGoal(tempGoal);
+            setEditingGoal(false);
+            setGoalSuccess(true);
+            setSuccessMessage('Daily calorie goal updated successfully!');
+            setTimeout(() => setGoalSuccess(false), 3000);
+        } catch (err) {
+            console.error('Error saving user goal:', err);
+            setError('Failed to save calorie goal. Please try again.');
+        }
+    };
+
+    // Function to calculate daily calories
+    const calculateDailyCalories = () => {
+        const today = new Date().toISOString().split('T')[0];
+        const dailyTotal = mealHistory
+            .filter(meal => meal.date === today)
+            .reduce((sum, meal) => sum + meal.food.calories, 0);
+        setDailyCalories(dailyTotal);
+        setNetCalories(dailyTotal); // Update net calories
+    };
+
+    // Function to calculate weekly calories
+    const calculateWeeklyCalories = () => {
+        const today = new Date().toISOString().split('T')[0];
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const weeklyTotal = mealHistory
+            .filter(meal => meal.date >= weekAgo && meal.date <= today)
+            .reduce((sum, meal) => sum + meal.food.calories, 0);
+        setWeeklyCalories(weeklyTotal);
+    };
 
     // Function to search for foods
     const handleSearch = async (e) => {
@@ -18,6 +96,7 @@ function NutritionTracker() {
 
         setLoading(true);
         setError(null);
+
 
         try {
             const response = await fetch(`http://localhost:4000/search?food=${encodeURIComponent(searchQuery)}`);
@@ -65,8 +144,195 @@ function NutritionTracker() {
         }
     };
 
+    // Function to log food and update daily calories
+    const handleLogFood = () => {
+        try {
+            setLoading(true);
+            setError(null);
+            setLogSuccess(false);
+
+            if (!selectedFood) {
+                throw new Error('No food selected to log');
+            }
+
+            const foodData = {
+                food: {
+                    name: selectedFood.food_name,
+                    serving_qty: selectedFood.serving_qty || 1,
+                    serving_unit: selectedFood.serving_unit || 'serving',
+                    calories: Number(selectedFood.calories) || 0,
+                    protein: Number(selectedFood.protein) || 0,
+                    carbs: Number(selectedFood.carbohydrates) || 0,
+                    fat: Number(selectedFood.total_fat) || 0,
+                    fiber: Number(selectedFood.fiber) || 0,
+                    sugar: Number(selectedFood.sugar) || 0
+                },
+                timestamp: new Date().toISOString(),
+                date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+            };
+
+            // Update meal history
+            const updatedHistory = [...mealHistory, foodData];
+            setMealHistory(updatedHistory);
+            localStorage.setItem('mealHistory', JSON.stringify(updatedHistory));
+
+            // Update calories
+            if (viewMode === 'daily') {
+                calculateDailyCalories();
+            } else {
+                calculateWeeklyCalories();
+            }
+            
+            setLogSuccess(true);
+            setSuccessMessage(`Food logged successfully! +${foodData.food.calories} calories added to ${viewMode === 'daily' ? "today's" : "this week's"} total.`);
+            setTimeout(() => setLogSuccess(false), 3000);
+        } catch (err) {
+            console.error('Error logging food:', err);
+            setError(err.message || 'Failed to log food. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Calculate progress percentage
+    const currentCalories = viewMode === 'daily' ? dailyCalories : weeklyCalories;
+    const currentGoal = viewMode === 'daily' ? dailyGoal : dailyGoal * 7;
+    const progressPercentage = Math.min((currentCalories / currentGoal) * 100, 100);
+    const remainingCalories = Math.max(currentGoal - currentCalories, 0);
+
+
+
     return (
         <div className="nutrition-tracker">
+            {/* Daily/Weekly Calorie Summary */}
+            <div className="daily-summary">
+                <div className="summary-header">
+                    <div className="header-top">
+                        <h2>📊 {viewMode === 'daily' ? "Today's" : "This Week's"} Nutrition Summary</h2>
+                        <div className="header-controls">
+                            <div className="view-toggle">
+                                <button 
+                                    className={`toggle-btn ${viewMode === 'daily' ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setViewMode('daily');
+                                        fetchDailyCalories();
+                                    }}
+                                >
+                                    Daily
+                                </button>
+                                <button 
+                                    className={`toggle-btn ${viewMode === 'weekly' ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setViewMode('weekly');
+                                        fetchWeeklyCalories();
+                                    }}
+                                >
+                                    Weekly
+                                </button>
+                            </div>
+                            <button 
+                                className="goal-edit-btn"
+                                onClick={() => setEditingGoal(!editingGoal)}
+                                title="Edit daily calorie goal"
+                            >
+                                ⚙
+                            </button>
+                        </div>
+                    </div>
+                    <div className="date-display">
+                        {viewMode === 'daily' 
+                            ? new Date().toLocaleDateString('en-US', { 
+                                weekday: 'long', 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            })
+                            : `${new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                        }
+                    </div>
+                    
+                    {editingGoal && (
+                        <div className="goal-editor">
+                            <div className="goal-input-group">
+                                <label htmlFor="calorieGoal">Daily Calorie Goal:</label>
+                                <input
+                                    type="number"
+                                    id="calorieGoal"
+                                    value={tempGoal}
+                                    onChange={(e) => setTempGoal(parseInt(e.target.value) || 2000)}
+                                    min="1000"
+                                    max="5000"
+                                    step="100"
+                                    className="goal-input"
+                                />
+                                <div className="goal-actions">
+                                    <button 
+                                        className="goal-save-btn"
+                                        onClick={saveUserGoal}
+                                    >
+                                        Save
+                                    </button>
+                                    <button 
+                                        className="goal-cancel-btn"
+                                        onClick={() => {
+                                            setEditingGoal(false);
+                                            setTempGoal(dailyGoal);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {goalSuccess && (
+                                <div className="success-message">
+                                    {successMessage}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+                
+                <div className="calorie-overview">
+                    <div className="calorie-main">
+                        <div className="calorie-display">
+                            <span className="calorie-number">{currentCalories}</span>
+                            <span className="calorie-unit">calories</span>
+                        </div>
+                        <div className="calorie-goal">
+                            of {currentGoal} {viewMode === 'daily' ? 'daily' : 'weekly'} goal
+                        </div>
+                    </div>
+                    
+                    <div className="calorie-progress">
+                        <div className="progress-bar">
+                            <div 
+                                className="progress-fill" 
+                                style={{ width: `${progressPercentage}%` }}
+                            ></div>
+                        </div>
+                        <div className="progress-text">
+                            {progressPercentage.toFixed(1)}% of {viewMode === 'daily' ? 'daily' : 'weekly'} goal
+                        </div>
+                    </div>
+                    
+                    <div className="calorie-stats">
+                        <div className="calorie-remaining">
+                            <span className="remaining-label">Remaining:</span>
+                            <span className="remaining-value">{remainingCalories} calories</span>
+                        </div>
+                        <div className="net-calories">
+                            <span className="net-label">Net Calories:</span>
+                            <span className="net-value" style={{ 
+                                color: netCalories > dailyGoal ? 'var(--error-color, #dc3545)' : 'var(--success-color, #28a745)'
+                            }}>
+                                {netCalories} calories
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="search-section">
                 <h2>🔍 Search Foods</h2>
                 <form onSubmit={handleSearch} className="search-form">
@@ -84,38 +350,55 @@ function NutritionTracker() {
 
                 {error && <div className="error-message">{error}</div>}
 
-                <div className="search-results">
-                    {searchResults.map((food, index) => (
-                        <div key={index} className="food-item" onClick={() => handleGetNutrition(food.food_name)}>
-                            <div className="food-item-header">
-                                <h3>{food.food_name}</h3>
-                                {food.brand_name && <span className="brand-name">{food.brand_name}</span>}
-                            </div>
-                            <div className="food-item-details">
-                                <span>
-                                    {food.serving_qty} {food.serving_unit}
-                                </span>
-                                <span>
-                                    {food.calories} cal
-                                </span>
-                            </div>
-                            <div className="food-item-macros">
-                                <div className="macro-item">
-                                    <span className="macro-value">{food.protein_g}</span>
-                                    <span className="macro-label">Protein</span>
-                                </div>
-                                <div className="macro-item">
-                                    <span className="macro-value">{food.carbs_g}</span>
-                                    <span className="macro-label">Carbs</span>
-                                </div>
-                                <div className="macro-item">
-                                    <span className="macro-value">{food.fat_g}</span>
-                                    <span className="macro-label">Fat</span>
-                                </div>
+                {/* Grid layout search results with internal scroll */}
+                {searchResults.length > 0 && (
+                    <div className="search-results-container">
+                        <h3>Search Results ({searchResults.length} found)</h3>
+                        
+                        <div className="results-viewport">
+                            <div className="results-grid">
+                                                                 {searchResults.map((food, index) => (
+                                     <div 
+                                         key={index} 
+                                         className="results-grid-food-item" 
+                                         onClick={() => handleGetNutrition(food.food_name)}
+                                     >
+                                        <div className="food-item-header">
+                                            <h4>{food.food_name}</h4>
+                                            {food.brand_name && <span className="brand-name">{food.brand_name}</span>}
+                                        </div>
+                                        <div className="food-item-details">
+                                            <span>
+                                                {food.serving_qty} {food.serving_unit}
+                                            </span>
+                                            <span>
+                                                {food.calories} cal
+                                            </span>
+                                        </div>
+                                        <div className="food-item-macros">
+                                            <div className="macro-item">
+                                                <span className="macro-value">{food.protein_g}</span>
+                                                <span className="macro-label">Protein</span>
+                                            </div>
+                                            <div className="macro-item">
+                                                <span className="macro-value">{food.carbs_g}</span>
+                                                <span className="macro-label">Carbs</span>
+                                            </div>
+                                            <div className="macro-item">
+                                                <span className="macro-value">{food.fat_g}</span>
+                                                <span className="macro-label">Fat</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
-                </div>
+                        
+                        <div className="pagination-info">
+                            {searchResults.length} results found
+                        </div>
+                    </div>
+                )}
             </div>
 
             {selectedFood && (
@@ -168,50 +451,13 @@ function NutritionTracker() {
 
                         {logSuccess && (
                             <div className="success-message">
-                                ✅ Food logged successfully!
+                                {successMessage}
                             </div>
                         )}
                         <button 
                             className="log-food-button"
                             disabled={loading}
-                            onClick={async () => {
-                                try {
-                                    setLoading(true);
-                                    setError(null);
-                                    setLogSuccess(false);
-
-                                    const user = auth.currentUser;
-                                    if (!user) {
-                                        throw new Error('Please sign in to log foods');
-                                    }
-
-                                    // Add to meals collection
-                                    await addDoc(collection(db, 'meals'), {
-                                        userId: user.uid,
-                                        food: {
-                                            name: selectedFood.food_name,
-                                            serving_qty: selectedFood.serving_qty,
-                                            serving_unit: selectedFood.serving_unit,
-                                            calories: selectedFood.calories,
-                                            protein: selectedFood.protein,
-                                            carbs: selectedFood.carbohydrates,
-                                            fat: selectedFood.total_fat,
-                                            fiber: selectedFood.fiber,
-                                            sugar: selectedFood.sugar
-                                        },
-                                        timestamp: serverTimestamp(),
-                                        date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
-                                    });
-
-                                    setLogSuccess(true);
-                                    setTimeout(() => setLogSuccess(false), 3000); // Hide success message after 3 seconds
-                                } catch (err) {
-                                    console.error('Error logging food:', err);
-                                    setError('Failed to log food. Please try again.');
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
+                            onClick={handleLogFood}
                         >
                             📝 Log This Food
                         </button>

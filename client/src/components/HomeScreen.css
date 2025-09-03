@@ -284,6 +284,171 @@
     color: var(--umber);
 }
 
+/* Medicine Tracker Styles */
+.medicine-tracker-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(108, 88, 76, 0.1);
+    border: 1px solid rgba(169, 132, 103, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.medicine-tracker-header {
+    text-align: center;
+}
+
+.medicine-tracker-header h3 {
+    font-size: 1.1rem;
+    color: var(--umber);
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+}
+
+.streak-info {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--chamoisee);
+}
+
+.current-streak, .longest-streak {
+    background: rgba(173, 193, 120, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.medicine-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 0.5rem;
+    background: rgba(173, 193, 120, 0.05);
+    border-radius: 10px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(169, 132, 103, 0.1);
+}
+
+.calendar-day.taken {
+    background: var(--olivine);
+    border-color: var(--olivine);
+}
+
+.calendar-day.missed {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: rgba(255, 107, 53, 0.2);
+}
+
+.calendar-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(108, 88, 76, 0.15);
+}
+
+.day-tooltip {
+    position: absolute;
+    font-size: 0.65rem;
+    color: var(--umber);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.calendar-day:hover .day-tooltip {
+    opacity: 1;
+}
+
+.medicine-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem;
+    background: rgba(173, 193, 120, 0.05);
+    border-radius: 10px;
+    margin-top: -0.5rem;
+}
+
+.medicine-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.medicine-stat-item .stat-label {
+    font-size: 0.75rem;
+    color: var(--chamoisee);
+}
+
+.medicine-stat-item .stat-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--umber);
+}
+
+.medicine-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--umber);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-color.taken {
+    background: var(--olivine);
+}
+
+.legend-color.missed {
+    background: rgba(255, 107, 53, 0.1);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.mark-taken-btn {
+    background: var(--olivine);
+    color: var(--umber);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+}
+
+.mark-taken-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(173, 193, 120, 0.4);
+}
+
 /* Center Content - Capybara Focus */
 .center-content {
     display: flex;
@@ -689,8 +854,23 @@
     .compact-greeting-card,
     .quick-stats-card,
     .compact-actions-card,
-    .compact-health-card {
+    .compact-health-card,
+    .medicine-tracker-card {
         padding: 0.75rem;
+    }
+
+    .medicine-calendar {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .streak-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .current-streak, .longest-streak {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
     }
 
     .capybara-stage-redesigned {
@@ -724,9 +904,50 @@
     .quick-stats-card,
     .compact-actions-card,
     .compact-health-card,
-    .capybara-stage-redesigned {
+    .capybara-stage-redesigned,
+    .medicine-tracker-card {
         padding: 1rem;
         border-radius: 12px;
+    }
+
+    .medicine-calendar {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 3px;
+        padding: 0.4rem;
+    }
+
+    .calendar-day {
+        border-radius: 3px;
+    }
+
+    .day-tooltip {
+        font-size: 0.6rem;
+    }
+
+    .medicine-stats {
+        padding: 0.5rem;
+        margin-top: -0.25rem;
+    }
+
+    .medicine-stat-item .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .medicine-stat-item .stat-value {
+        font-size: 0.8rem;
+    }
+
+    .medicine-tracker-header h3 {
+        font-size: 1rem;
+    }
+
+    .streak-info {
+        font-size: 0.75rem;
+    }
+
+    .mark-taken-btn {
+        padding: 0.6rem;
+        font-size: 0.85rem;
     }
 
     .capybara-sprite-large {

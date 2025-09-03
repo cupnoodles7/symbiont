@@ -60,6 +60,65 @@ function HomeScreen() {
                     </div>
                 </div>
 
+                <div className="medicine-tracker-card">
+                    <div className="medicine-tracker-header">
+                        <h3>Medicine Streak 💊</h3>
+                        <div className="streak-info">
+                            <span className="current-streak">Current: 7 days</span>
+                            <span className="longest-streak">Longest: 14 days</span>
+                        </div>
+                    </div>
+                    
+                    <div className="medicine-calendar">
+                        {Array.from({ length: 30 }, (_, i) => {
+                            const date = new Date();
+                            date.setDate(date.getDate() - i);
+                            // Dummy pattern: Taken on all days except weekends and random 2 days
+                            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                            const skipDays = [5, 12]; // Randomly missed on 5th and 12th day
+                            const taken = !isWeekend && !skipDays.includes(i);
+                            
+                            return (
+                                <div 
+                                    key={i} 
+                                    className={`calendar-day ${taken ? 'taken' : 'missed'}`}
+                                    title={`${date.toLocaleDateString()}: ${taken ? 'Taken' : 'Missed'}`}
+                                >
+                                    <span className="day-tooltip">
+                                        {date.getDate()}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="medicine-stats">
+                        <div className="medicine-stat-item">
+                            <span className="stat-label">This Month</span>
+                            <span className="stat-value">22/30 days</span>
+                        </div>
+                        <div className="medicine-stat-item">
+                            <span className="stat-label">Adherence</span>
+                            <span className="stat-value">73%</span>
+                        </div>
+                    </div>
+
+                    <div className="medicine-legend">
+                        <div className="legend-item">
+                            <div className="legend-color taken"></div>
+                            <span>Taken</span>
+                        </div>
+                        <div className="legend-item">
+                            <div className="legend-color missed"></div>
+                            <span>Missed</span>
+                        </div>
+                    </div>
+
+                    <button className="mark-taken-btn">
+                        Mark Today's Medicines as Taken ✓
+                    </button>
+                </div>
+
                 {/* AI Assistant Card */}
                 <div className="ai-assistant-card">
                     <div className="ai-card-header">
