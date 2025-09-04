@@ -164,19 +164,22 @@ body {
     }
 }
 
-/* Capybara Image Styles */
-.capybara-image {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
+/* Capybara Animation Styles - Clean sprite rendering, no borders or backgrounds */
+.capybara-illustration img,
+.capybara-sprite {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
     transition: all 0.3s ease;
-    border-radius: 0;
-    /* Sharp corners as requested */
-    max-width: 100%;
-    max-height: 100%;
+    display: block;
+    margin: 0 auto;
 }
 
-.capybara-image:hover {
+.capybara-illustration img:hover,
+.capybara-sprite:hover {
     transform: scale(1.05);
     filter: drop-shadow(0 6px 12px rgba(108, 88, 76, 0.3));
 }
@@ -447,3 +450,6 @@ body {
     outline: 2px solid var(--olivine);
     outline-offset: 2px;
 }
+
+
+

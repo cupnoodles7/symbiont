@@ -5,16 +5,36 @@ import NutritionTracker from './NutritionTracker';
 import Community from './community'; // Ensure file is capitalized if named Community.js
 import Profile from './Profile';
 import AIChatAssistant from './AIChatAssistant';
+<<<<<<< Updated upstream
 import WorkoutAnalyzer from './WorkoutAnalyzer';
+=======
+import CapybaraSprite from './CapybaraSprite';
+import useCapybaraState from '../hooks/useCapybaraState';
+>>>>>>> Stashed changes
 
 function HomeScreen() {
     const { userData } = useUser();
     const [activeTab, setActiveTab] = useState('home');
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [capybaraMood, setCapybaraMood] = useState('happy');
+    const [capybaraState, setCapybaraState] = useState('idle');
     const [showAIChat, setShowAIChat] = useState(false);
+<<<<<<< Updated upstream
     const [weatherData, setWeatherData] = useState(null);
     const [weatherSuggestion, setWeatherSuggestion] = useState('');
+=======
+    
+    // Capybara state and XP system
+    const { 
+        xpScore, 
+        currentState, 
+        achievements, 
+        activityLog, 
+        logActivity, 
+        getContextState,
+        dailyGoals,
+        getHealthStatus 
+    } = useCapybaraState();
+>>>>>>> Stashed changes
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -102,6 +122,25 @@ function HomeScreen() {
         return 'Good evening';
     };
 
+    // Determine the best animation based on user's current state
+    const getHomeCapybaraState = () => {
+        // Calculate scores for each area
+        const nutritionScore = (activityLog.meals.count / dailyGoals.meals) * 100;
+        const activityScore = (activityLog.exercise.count / dailyGoals.exercise) * 100;
+        const healthScore = (nutritionScore + activityScore + (activityLog.water.count / dailyGoals.water) * 100) / 3;
+
+        // Priority logic: Health > Activity > Nutrition
+        if (healthScore >= 80) {
+            return 'celebrate'; // Health is excellent
+        } else if (activityScore >= 70) {
+            return 'walk'; // Activity is good
+        } else if (nutritionScore >= 60) {
+            return 'eat'; // Nutrition is decent
+        } else {
+            return 'idle'; // Default state
+        }
+    };
+
     // Home Tab Content
     const renderHomeContent = () => (
         <div className="home-layout">
@@ -134,15 +173,23 @@ function HomeScreen() {
                     <div className="quick-stats-title">Today's Progress</div>
                     <div className="stat-item">
                         <span className="stat-label">💧 Water</span>
-                        <span className="stat-value">6/8</span>
+                        <span className="stat-value">{activityLog.water.count}/{dailyGoals.water}</span>
                     </div>
                     <div className="stat-item">
-                        <span className="stat-label">🚶 Steps</span>
-                        <span className="stat-value">4.5k</span>
+                        <span className="stat-label">🚶 Exercise</span>
+                        <span className="stat-value">{activityLog.exercise.count}/{dailyGoals.exercise}</span>
                     </div>
                     <div className="stat-item">
                         <span className="stat-label">😴 Sleep</span>
-                        <span className="stat-value">7.5h</span>
+                        <span className="stat-value">{activityLog.sleep.hours}h/{dailyGoals.sleep}h</span>
+                    </div>
+                    <div className="stat-item">
+                        <span className="stat-label">🥗 Meals</span>
+                        <span className="stat-value">{activityLog.meals.count}/{dailyGoals.meals}</span>
+                    </div>
+                    <div className="stat-item">
+                        <span className="stat-label">⭐ XP Score</span>
+                        <span className="stat-value">{xpScore}/100</span>
                     </div>
                 </div>
 
@@ -209,32 +256,57 @@ function HomeScreen() {
             {/* Center Content - Capybara */}
             <div className="center-content">
                 <div className="capybara-stage">
-                    <div className="capybara-sprite">
-                        <img src="/cappy.png" alt="Capybara" />
+                    <CapybaraSprite
+                        currentState={getHomeCapybaraState()}
+                        size={150}
+                        context="home"
+                        showDescription={true}
+                        className="main-capybara"
+                        activityLog={activityLog}
+                        xpScore={xpScore}
+                    />
+                    
+                    {/* XP and Health Status */}
+                    <div className="xp-display">
+                        <div className="xp-bar">
+                            <div className="xp-fill" style={{ width: `${xpScore}%` }}></div>
+                        </div>
+                        <span className="xp-text">XP: {xpScore}/100 ({getHealthStatus()})</span>
                     </div>
-                    <div className="mood-indicator">
-                        <span className="mood-emoji">
-                            {capybaraMood === 'eating' ? '🥕' : capybaraMood === 'playing' ? '🎾' : capybaraMood === 'loved' ? '💝' : '😊'}
-                        </span>
-                        <span className="mood-text">
-                            {capybaraMood === 'eating'
-                                ? 'Eating happily!'
-                                : capybaraMood === 'playing'
-                                    ? 'Having fun!'
-                                    : capybaraMood === 'loved'
-                                        ? 'Feeling loved!'
-                                        : 'Feeling Great!'}
-                        </span>
-                    </div>
+                    
+                    {achievements.length > 0 && (
+                        <div className="achievement-notification">
+                            <span className="achievement-icon">🎉</span>
+                            <span className="achievement-text">
+                                Goals completed: {achievements.join(', ')}!
+                            </span>
+                        </div>
+                    )}
+                    
                     <div className="interaction-buttons">
-                        <button className="interact-btn feed-btn" onClick={() => setCapybaraMood('eating')}>
+                        <button 
+                            className="interact-btn feed-btn" 
+                            onClick={() => logActivity('meals')}
+                        >
                             🥕 Feed
                         </button>
-                        <button className="interact-btn play-btn" onClick={() => setCapybaraMood('playing')}>
-                            🎾 Play
+                        <button 
+                            className="interact-btn exercise-btn" 
+                            onClick={() => logActivity('exercise')}
+                        >
+                            🚶 Exercise
                         </button>
-                        <button className="interact-btn pet-btn" onClick={() => setCapybaraMood('loved')}>
-                            💝 Pet
+                        <button 
+                            className="interact-btn water-btn" 
+                            onClick={() => logActivity('water')}
+                        >
+                            💧 Water
+                        </button>
+                        <button 
+                            className="interact-btn sleep-btn" 
+                            onClick={() => logActivity('sleep', 8)}
+                        >
+                            😴 Sleep
                         </button>
                     </div>
                 </div>
@@ -301,6 +373,15 @@ function HomeScreen() {
             <div className="tab-header">
                 <h2>🍎 Nutrition Center</h2>
                 <p>Track your daily nutrition and meal planning</p>
+                <CapybaraSprite
+                    currentState="eat"
+                    size={120}
+                    context="nutrition"
+                    showDescription={true}
+                    className="tab-capybara"
+                    activityLog={activityLog}
+                    xpScore={xpScore}
+                />
             </div>
             <NutritionTracker />
         </div>
@@ -309,7 +390,46 @@ function HomeScreen() {
     // Activity Tab
     const renderActivityContent = () => (
         <div className="tab-content activity-tab">
+<<<<<<< Updated upstream
             <WorkoutAnalyzer />
+=======
+            <div className="tab-header">
+                <h2>🏃 Activity Hub</h2>
+                <p>Monitor your physical activity and fitness progress</p>
+                <CapybaraSprite
+                    currentState="walk"
+                    size={120}
+                    context="activity"
+                    showDescription={true}
+                    className="tab-capybara"
+                    activityLog={activityLog}
+                    xpScore={xpScore}
+                />
+            </div>
+            <div className="activity-content">
+                <div className="activity-stats">
+                    <h3>Today's Activity</h3>
+                    <div className="activity-grid">
+                        <div className="activity-card">
+                            <span className="activity-icon">🚶</span>
+                            <span className="activity-label">Exercise Sessions</span>
+                            <span className="activity-value">{activityLog.exercise.count}/{dailyGoals.exercise}</span>
+                        </div>
+                        <div className="activity-card">
+                            <span className="activity-icon">⭐</span>
+                            <span className="activity-label">Activity XP</span>
+                            <span className="activity-value">{Math.round((activityLog.exercise.count / dailyGoals.exercise) * 30)}/30</span>
+                        </div>
+                    </div>
+                    <button 
+                        className="log-exercise-btn"
+                        onClick={() => logActivity('exercise')}
+                    >
+                        🏃 Log Exercise Session
+                    </button>
+                </div>
+            </div>
+>>>>>>> Stashed changes
         </div>
     );
 
@@ -319,11 +439,47 @@ function HomeScreen() {
             <div className="tab-header">
                 <h2>❤️ Health Monitor</h2>
                 <p>Monitor your vital signs and health metrics</p>
+                <CapybaraSprite
+                    currentState="celebrate"
+                    size={120}
+                    context="health"
+                    showDescription={true}
+                    className="tab-capybara"
+                    activityLog={activityLog}
+                    xpScore={xpScore}
+                />
             </div>
-            <div className="coming-soon">
-                <div className="coming-soon-icon">❤️</div>
-                <h3>Health Dashboard</h3>
-                <p>Coming soon - Track your vital signs and health metrics with real-time monitoring</p>
+            <div className="health-content">
+                <div className="health-overview">
+                    <h3>Overall Health Status: {getHealthStatus()}</h3>
+                    <div className="health-metrics">
+                        <div className="health-metric">
+                            <span className="metric-icon">⭐</span>
+                            <span className="metric-label">XP Score</span>
+                            <span className="metric-value">{xpScore}/100</span>
+                        </div>
+                        <div className="health-metric">
+                            <span className="metric-icon">🍎</span>
+                            <span className="metric-label">Nutrition</span>
+                            <span className="metric-value">{activityLog.meals.count}/{dailyGoals.meals}</span>
+                        </div>
+                        <div className="health-metric">
+                            <span className="metric-icon">💧</span>
+                            <span className="metric-label">Hydration</span>
+                            <span className="metric-value">{activityLog.water.count}/{dailyGoals.water}</span>
+                        </div>
+                        <div className="health-metric">
+                            <span className="metric-icon">🏃</span>
+                            <span className="metric-label">Exercise</span>
+                            <span className="metric-value">{activityLog.exercise.count}/{dailyGoals.exercise}</span>
+                        </div>
+                        <div className="health-metric">
+                            <span className="metric-icon">😴</span>
+                            <span className="metric-label">Sleep</span>
+                            <span className="metric-value">{activityLog.sleep.hours}h/{dailyGoals.sleep}h</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -443,3 +599,5 @@ function HomeScreen() {
 }
 
 export default HomeScreen;
+
+

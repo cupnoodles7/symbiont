@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import CapyAnimation from './CapyAnimation';
 import './Login.css';
 
 function Login({ onSwitchToSignup, onComplete }) {
@@ -89,10 +90,10 @@ function Login({ onSwitchToSignup, onComplete }) {
                 </div>
 
                 <div className="capybara-illustration">
-                    <img
-                        src="cappy.png"
-                        alt="Capybara"
-                        className="capybara-image"
+                    <CapyAnimation 
+                        state="idle" 
+                        size={128}
+                        className="capybara-sprite"
                     />
                 </div>
 

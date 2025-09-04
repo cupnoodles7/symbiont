@@ -1,0 +1,382 @@
+.capybara-sprite-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.sprite-display {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.capybara-canvas,
+.capybara-animation {
+    border: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    transition: none;
+}
+
+.sprite-fallback {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4f1d4 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+.fallback-image {
+    width: 128px;
+    height: 128px;
+    border-radius: 8px;
+}
+
+.sprite-loading {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e0e0e0;
+    border-top: 2px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.state-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    text-align: center;
+}
+
+.state-emoji {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.state-info {
+    flex: 1;
+}
+
+.state-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.25rem 0;
+}
+
+.state-description {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.personalized-message {
+    color: #4a5568 !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #68d391;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 0.5rem;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Health status styles */
+.health-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #f39c12;
+    color: #856404;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    animation: pulse 2s infinite;
+}
+
+.achievement-notification {
+    background: linear-gradient(135deg, #d4edda 0%, #a3e4a1 100%);
+    border: 1px solid #28a745;
+    color: #155724;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    animation: celebrate 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes celebrate {
+    0% { transform: scale(0.8) rotate(-5deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.warning-icon,
+.achievement-icon {
+    font-size: 1.2rem;
+}
+
+/* Metric bars */
+.metric-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.metric-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #81C784 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Animation states for different health levels */
+.capybara-sprite-container.sick .capybara-canvas {
+    filter: saturate(0.7) brightness(0.9);
+    animation: sickPulse 3s infinite;
+}
+
+.capybara-sprite-container.celebrate .capybara-canvas {
+    filter: saturate(1.2) brightness(1.1);
+    animation: celebrateBounce 1s ease-in-out;
+}
+
+@keyframes sickPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+@keyframes celebrateBounce {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.05) rotate(2deg); }
+    75% { transform: scale(1.05) rotate(-2deg); }
+    100% { transform: scale(1); }
+}
+
+/* XP Display */
+.xp-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.xp-bar {
+    width: 200px;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 50%, #FFEB3B 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.xp-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.xp-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Tab Capybara - smaller version for tab headers */
+.tab-capybara {
+    margin: 0.5rem 0;
+}
+
+.tab-capybara .capybara-sprite-container {
+    padding: 0.5rem;
+}
+
+.tab-capybara .sprite-display {
+    margin-bottom: 0;
+}
+
+/* Activity content */
+.activity-content {
+    padding: 1rem;
+}
+
+.activity-stats {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.activity-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.activity-icon {
+    font-size: 2rem;
+}
+
+.activity-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.activity-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.log-exercise-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.log-exercise-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.log-exercise-btn:active {
+    transform: translateY(0);
+}
+
+/* Health content */
+.health-content {
+    padding: 1rem;
+}
+
+.health-overview {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.health-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.health-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.health-metric .metric-icon {
+    font-size: 2rem;
+}
+
+.health-metric .metric-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.health-metric .metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+}
