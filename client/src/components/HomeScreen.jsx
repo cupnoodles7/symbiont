@@ -5,12 +5,9 @@ import NutritionTracker from './NutritionTracker';
 import Community from './community'; // Ensure file is capitalized if named Community.js
 import Profile from './Profile';
 import AIChatAssistant from './AIChatAssistant';
-<<<<<<< Updated upstream
 import WorkoutAnalyzer from './WorkoutAnalyzer';
-=======
 import CapybaraSprite from './CapybaraSprite';
 import useCapybaraState from '../hooks/useCapybaraState';
->>>>>>> Stashed changes
 
 function HomeScreen() {
     const { userData } = useUser();
@@ -18,10 +15,8 @@ function HomeScreen() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [capybaraState, setCapybaraState] = useState('idle');
     const [showAIChat, setShowAIChat] = useState(false);
-<<<<<<< Updated upstream
     const [weatherData, setWeatherData] = useState(null);
     const [weatherSuggestion, setWeatherSuggestion] = useState('');
-=======
     
     // Capybara state and XP system
     const { 
@@ -34,7 +29,6 @@ function HomeScreen() {
         dailyGoals,
         getHealthStatus 
     } = useCapybaraState();
->>>>>>> Stashed changes
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -390,9 +384,6 @@ function HomeScreen() {
     // Activity Tab
     const renderActivityContent = () => (
         <div className="tab-content activity-tab">
-<<<<<<< Updated upstream
-            <WorkoutAnalyzer />
-=======
             <div className="tab-header">
                 <h2>🏃 Activity Hub</h2>
                 <p>Monitor your physical activity and fitness progress</p>
@@ -406,30 +397,7 @@ function HomeScreen() {
                     xpScore={xpScore}
                 />
             </div>
-            <div className="activity-content">
-                <div className="activity-stats">
-                    <h3>Today's Activity</h3>
-                    <div className="activity-grid">
-                        <div className="activity-card">
-                            <span className="activity-icon">🚶</span>
-                            <span className="activity-label">Exercise Sessions</span>
-                            <span className="activity-value">{activityLog.exercise.count}/{dailyGoals.exercise}</span>
-                        </div>
-                        <div className="activity-card">
-                            <span className="activity-icon">⭐</span>
-                            <span className="activity-label">Activity XP</span>
-                            <span className="activity-value">{Math.round((activityLog.exercise.count / dailyGoals.exercise) * 30)}/30</span>
-                        </div>
-                    </div>
-                    <button 
-                        className="log-exercise-btn"
-                        onClick={() => logActivity('exercise')}
-                    >
-                        🏃 Log Exercise Session
-                    </button>
-                </div>
-            </div>
->>>>>>> Stashed changes
+            <WorkoutAnalyzer />
         </div>
     );
 
