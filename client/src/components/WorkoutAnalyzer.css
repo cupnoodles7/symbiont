@@ -1,4 +1,233 @@
 /* Workout Analyzer - Compact & Minimalistic Design */
+
+/* Mode Selector */
+.mode-selector {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.mode-options {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.mode-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid rgba(169, 132, 103, 0.3);
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--chamoisee);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.mode-btn:hover {
+    background: rgba(173, 193, 120, 0.1);
+    border-color: var(--olivine);
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background: var(--olivine);
+    color: var(--umber);
+    border-color: var(--olivine);
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+}
+
+.mode-description {
+    color: var(--chamoisee);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Motion Results */
+.motion-results {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.detected-activity-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    border: 3px solid var(--olivine);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.activity-icon {
+    font-size: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.activity-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: var(--umber);
+    font-weight: 700;
+}
+
+.activity-info p {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--chamoisee);
+    font-weight: 600;
+}
+
+.activity-scores h4 {
+    color: var(--umber);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.activity-score {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(173, 193, 120, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(173, 193, 120, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.activity-name {
+    min-width: 100px;
+    font-weight: 600;
+    color: var(--umber);
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+
+.score-bar {
+    flex: 1;
+    height: 20px;
+    background: rgba(169, 132, 103, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.score-fill {
+    height: 100%;
+    background: var(--olivine);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.score-value {
+    min-width: 50px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--chamoisee);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design for Mode Selector */
+@media (max-width: 768px) {
+    .mode-options {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .mode-btn {
+        width: 200px;
+    }
+    
+    .detected-activity-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .activity-icon {
+        font-size: 3rem;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .activity-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .activity-score {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .activity-name {
+        min-width: auto;
+    }
+    
+    .score-bar {
+        width: 100%;
+    }
+}
+
+/* Movement Statistics */
+.movement-stats {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(173, 193, 120, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(173, 193, 120, 0.1);
+}
+
+.movement-stats h4 {
+    color: var(--umber);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.movement-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.movement-stats .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(169, 132, 103, 0.1);
+}
+
+.movement-stats .stat-label {
+    color: var(--chamoisee);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.movement-stats .stat-value {
+    color: var(--umber);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Responsive for movement stats */
+@media (max-width: 768px) {
+    .movement-stats .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
 :root {
     --parchment: #f0ead2ff;
     --tea-green: #dde5b6ff;

@@ -9,6 +9,7 @@ export default function WorkoutAnalyzer() {
   const [error, setError] = useState(null);
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState("");
+  const [analysisMode, setAnalysisMode] = useState("workout"); // "workout" or "motion"
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -51,13 +52,15 @@ export default function WorkoutAnalyzer() {
     formData.append("video", video);
 
     try {
-      const res = await axios.post("http://localhost:5000/analyze", formData, {
+      // Choose endpoint based on analysis mode
+      const endpoint = analysisMode === "motion" ? "detect_motion" : "analyze";
+      const res = await axios.post(`http://localhost:5000/${endpoint}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setFeedback(res.data);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || "Failed to analyze workout. Please try again.");
+      setError(err.response?.data?.error || "Failed to analyze video. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -68,8 +71,33 @@ export default function WorkoutAnalyzer() {
       {/* Header Section */}
       <div className="analyzer-header">
         <div className="header-content">
-          <h1>Workout Analysis</h1>
-          <p>AI-powered form assessment and rep counting</p>
+          <h1>Video Analysis</h1>
+          <p>AI-powered analysis for workouts and motion detection</p>
+        </div>
+      </div>
+
+      {/* Mode Selector */}
+      <div className="mode-selector">
+        <div className="mode-options">
+          <button
+            className={`mode-btn ${analysisMode === "workout" ? "active" : ""}`}
+            onClick={() => setAnalysisMode("workout")}
+          >
+            💪 Workout Analysis
+          </button>
+          <button
+            className={`mode-btn ${analysisMode === "motion" ? "active" : ""}`}
+            onClick={() => setAnalysisMode("motion")}
+          >
+            🎥 Motion Detection
+          </button>
+        </div>
+        <div className="mode-description">
+          {analysisMode === "workout" ? (
+            <p>Analyze workout form, count reps, and get fitness feedback</p>
+          ) : (
+            <p>Detect sleeping, drinking, eating, and idle activities in CCTV videos</p>
+          )}
         </div>
       </div>
 
@@ -124,7 +152,7 @@ export default function WorkoutAnalyzer() {
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
-                <span>Analyze Workout</span>
+                <span>{analysisMode === "workout" ? "Analyze Workout" : "Detect Motion"}</span>
               </>
             )}
           </button>
@@ -150,28 +178,92 @@ export default function WorkoutAnalyzer() {
         <div className="results-section">
           <div className="results-header">
             <h2>Analysis Results</h2>
-            <p>Your workout performance breakdown</p>
+            <p>{analysisMode === "workout" ? "Your workout performance breakdown" : "Motion detection analysis"}</p>
           </div>
 
           {/* Stats Grid */}
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">{feedback.summary?.squats || 0}</div>
-              <div className="stat-label">Squats</div>
+          {analysisMode === "workout" ? (
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-value">{feedback.summary?.squats || 0}</div>
+                <div className="stat-label">Squats</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{feedback.summary?.pushups || 0}</div>
+                <div className="stat-label">Push-ups</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{feedback.summary?.backrows || 0}</div>
+                <div className="stat-label">Back Rows</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{feedback.duration_sec || 0}s</div>
+                <div className="stat-label">Duration</div>
+              </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.summary?.pushups || 0}</div>
-              <div className="stat-label">Push-ups</div>
+          ) : (
+            <div className="motion-results">
+              <div className="detected-activity-card">
+                <div className="activity-icon">
+                  {feedback.detected_activity === 'sleeping' && '😴'}
+                  {feedback.detected_activity === 'drinking' && '🥤'}
+                  {feedback.detected_activity === 'eating' && '🍽️'}
+                  {feedback.detected_activity === 'idle' && '🧘'}
+                </div>
+                <div className="activity-info">
+                  <h3>{feedback.detected_activity?.charAt(0).toUpperCase() + feedback.detected_activity?.slice(1)}</h3>
+                  <p>Confidence: {(feedback.confidence * 100)?.toFixed(1)}%</p>
+                </div>
+              </div>
+              
+              <div className="activity-scores">
+                <h4>All Activity Scores</h4>
+                {feedback.all_activities && Object.entries(feedback.all_activities).map(([activity, score]) => (
+                  <div key={activity} className="activity-score">
+                    <span className="activity-name">{activity}</span>
+                    <div className="score-bar">
+                      <div 
+                        className="score-fill" 
+                        style={{ width: `${score * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="score-value">{(score * 100).toFixed(1)}%</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Movement Statistics */}
+              <div className="movement-stats">
+                <h4>Movement Analysis</h4>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-label">Movement Score:</span>
+                    <span className="stat-value">{feedback.movement_score}%</span>
+                  </div>
+                  {feedback.movement_stats && (
+                    <>
+                      <div className="stat-item">
+                        <span className="stat-label">Average:</span>
+                        <span className="stat-value">{feedback.movement_stats.average}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Max:</span>
+                        <span className="stat-value">{feedback.movement_stats.max}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Min:</span>
+                        <span className="stat-value">{feedback.movement_stats.min}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Variance:</span>
+                        <span className="stat-value">{feedback.movement_stats.variance}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.summary?.backrows || 0}</div>
-              <div className="stat-label">Back Rows</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{feedback.duration_sec || 0}s</div>
-              <div className="stat-label">Duration</div>
-            </div>
-          </div>
+          )}
 
           {/* Form Scores */}
           {feedback.form_scores && (
