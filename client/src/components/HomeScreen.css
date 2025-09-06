@@ -1652,7 +1652,7 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .interact-btn {
@@ -1669,9 +1669,9 @@
 }
 
 .feed-btn {
-    background: #adc178;
-    color: #6c584c;
-    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+    background: rgba(169, 132, 103, 0.1);
+    color: #a98467;
+    border: 2px solid rgba(169, 132, 103, 0.3);
 }
 
 .play-btn {
@@ -1686,6 +1686,24 @@
     border: 2px solid rgba(255, 107, 53, 0.3);
 }
 
+.exercise-btn {
+    background: rgba(169, 132, 103, 0.1);
+    color: #a98467;
+    border: 2px solid rgba(169, 132, 103, 0.3);
+}
+
+.water-btn {
+    background: rgba(169, 132, 103, 0.1);
+    color: #a98467;
+    border: 2px solid rgba(169, 132, 103, 0.3);
+}
+
+.sleep-btn {
+    background: rgba(169, 132, 103, 0.1);
+    color: #a98467;
+    border: 2px solid rgba(169, 132, 103, 0.3);
+}
+
 /* Right Sidebar Styles */
 .right-sidebar {
     display: flex;
@@ -1693,7 +1711,7 @@
     gap: 1rem;
 }
 
-.quick-actions-card {
+.ai-chat-card {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px);
     border-radius: 15px;
@@ -1702,12 +1720,73 @@
     border: 1px solid rgba(169, 132, 103, 0.2);
 }
 
-.quick-actions-title {
+.ai-chat-title {
     font-size: 0.9rem;
     font-weight: 600;
     color: #6c584c;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.ai-chat-description {
+    font-size: 0.75rem;
+    color: #a98467;
     margin-bottom: 1rem;
     text-align: center;
+    line-height: 1.3;
+}
+
+.ai-chat-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #adc178, #9bb56a);
+    color: #6c584c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(173, 193, 120, 0.3);
+}
+
+.ai-chat-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(173, 193, 120, 0.4);
+}
+
+.ai-button-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ai-button-icon {
+    font-size: 1.2rem;
+}
+
+.ai-button-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ai-button-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.ai-button-subtitle {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.ai-button-arrow {
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .action-button {

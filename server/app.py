@@ -690,4 +690,3 @@ if __name__ == "__main__":
         print("   /predict_video - Position classifier (model not loaded)")
         print("⚠️ Using fallback simple analysis for motion detection")
     print("🎯 Ready to analyze workout videos!")
-    app.run(port=5000, debug=True)

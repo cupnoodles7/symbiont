@@ -17,17 +17,17 @@ function HomeScreen() {
     const [showAIChat, setShowAIChat] = useState(false);
     const [weatherData, setWeatherData] = useState(null);
     const [weatherSuggestion, setWeatherSuggestion] = useState('');
-    
+
     // Capybara state and XP system
-    const { 
-        xpScore, 
-        currentState, 
-        achievements, 
-        activityLog, 
-        logActivity, 
+    const {
+        xpScore,
+        currentState,
+        achievements,
+        activityLog,
+        logActivity,
         getContextState,
         dailyGoals,
-        getHealthStatus 
+        getHealthStatus
     } = useCapybaraState();
 
     useEffect(() => {
@@ -186,6 +186,86 @@ function HomeScreen() {
                         <span className="stat-value">{xpScore}/100</span>
                     </div>
                 </div>
+            </div>
+
+            {/* Center Content - Capybara */}
+            <div className="center-content">
+                <div className="capybara-stage">
+                    <CapybaraSprite
+                        currentState={getHomeCapybaraState()}
+                        size={150}
+                        context="home"
+                        showDescription={true}
+                        className="main-capybara"
+                        activityLog={activityLog}
+                        xpScore={xpScore}
+                    />
+
+                    {/* XP and Health Status */}
+                    <div className="xp-display">
+                        <div className="xp-bar">
+                            <div className="xp-fill" style={{ width: `${xpScore}%` }}></div>
+                        </div>
+                        <span className="xp-text">XP: {xpScore}/100 ({getHealthStatus()})</span>
+                    </div>
+
+                    {achievements.length > 0 && (
+                        <div className="achievement-notification">
+                            <span className="achievement-icon">🎉</span>
+                            <span className="achievement-text">
+                                Goals completed: {achievements.join(', ')}!
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="interaction-buttons">
+                        <button
+                            className="interact-btn feed-btn"
+                            onClick={() => logActivity('meals')}
+                        >
+                            🥕 Feed
+                        </button>
+                        <button
+                            className="interact-btn exercise-btn"
+                            onClick={() => logActivity('exercise')}
+                        >
+                            🚶 Exercise
+                        </button>
+                        <button
+                            className="interact-btn water-btn"
+                            onClick={() => logActivity('water')}
+                        >
+                            💧 Water
+                        </button>
+                        <button
+                            className="interact-btn sleep-btn"
+                            onClick={() => logActivity('sleep', 8)}
+                        >
+                            😴 Sleep
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Sidebar */}
+            <div className="right-sidebar">
+                <div className="ai-chat-card">
+                    <div className="ai-chat-title">AI Health Assistant</div>
+                    <div className="ai-chat-description">Get personalized health advice and support</div>
+                    <button
+                        className="ai-chat-button"
+                        onClick={() => setShowAIChat(true)}
+                    >
+                        <div className="ai-button-content">
+                            <div className="ai-button-icon">🤖</div>
+                            <div className="ai-button-text">
+                                <span className="ai-button-title">Chat with AI</span>
+                                <span className="ai-button-subtitle">Ask health questions</span>
+                            </div>
+                        </div>
+                        <div className="ai-button-arrow">→</div>
+                    </button>
+                </div>
 
                 <div className="medicine-tracker-card">
                     <div className="medicine-tracker-header">
@@ -244,93 +324,6 @@ function HomeScreen() {
                     <button className="mark-taken-btn">
                         Mark Today's Medicines as Taken ✓
                     </button>
-                </div>
-            </div>
-
-            {/* Center Content - Capybara */}
-            <div className="center-content">
-                <div className="capybara-stage">
-                    <CapybaraSprite
-                        currentState={getHomeCapybaraState()}
-                        size={150}
-                        context="home"
-                        showDescription={true}
-                        className="main-capybara"
-                        activityLog={activityLog}
-                        xpScore={xpScore}
-                    />
-                    
-                    {/* XP and Health Status */}
-                    <div className="xp-display">
-                        <div className="xp-bar">
-                            <div className="xp-fill" style={{ width: `${xpScore}%` }}></div>
-                        </div>
-                        <span className="xp-text">XP: {xpScore}/100 ({getHealthStatus()})</span>
-                    </div>
-                    
-                    {achievements.length > 0 && (
-                        <div className="achievement-notification">
-                            <span className="achievement-icon">🎉</span>
-                            <span className="achievement-text">
-                                Goals completed: {achievements.join(', ')}!
-                            </span>
-                        </div>
-                    )}
-                    
-                    <div className="interaction-buttons">
-                        <button 
-                            className="interact-btn feed-btn" 
-                            onClick={() => logActivity('meals')}
-                        >
-                            🥕 Feed
-                        </button>
-                        <button 
-                            className="interact-btn exercise-btn" 
-                            onClick={() => logActivity('exercise')}
-                        >
-                            🚶 Exercise
-                        </button>
-                        <button 
-                            className="interact-btn water-btn" 
-                            onClick={() => logActivity('water')}
-                        >
-                            💧 Water
-                        </button>
-                        <button 
-                            className="interact-btn sleep-btn" 
-                            onClick={() => logActivity('sleep', 8)}
-                        >
-                            😴 Sleep
-                        </button>
-                    </div>
-                </div>
-
-                {/* AI Chat Button - Integrated */}
-                <div className="ai-chat-integrated">
-                    <button
-                        className="ai-chat-button-integrated"
-                        onClick={() => setShowAIChat(true)}
-                    >
-                        <div className="ai-button-content-integrated">
-                            <div className="ai-button-icon-integrated">🤖</div>
-                            <div className="ai-button-text-integrated">
-                                <span className="ai-button-title-integrated">AI Health Assistant</span>
-                                <span className="ai-button-subtitle-integrated">Get personalized health advice</span>
-                            </div>
-                        </div>
-                        <div className="ai-button-arrow-integrated">→</div>
-                    </button>
-                </div>
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="right-sidebar">
-                <div className="quick-actions-card">
-                    <div className="quick-actions-title">Quick Actions</div>
-                    <button className="action-button primary-action">➕ Log Meal</button>
-                    <button className="action-button">💧 Add Water</button>
-                    <button className="action-button">🏃 Exercise</button>
-                    <button className="action-button">📊 Reports</button>
                 </div>
 
                 <div className="health-metrics-card">
