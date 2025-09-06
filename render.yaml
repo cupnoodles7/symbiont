@@ -3,15 +3,16 @@ services:
   - type: web
     name: symbiont-backend
     env: node
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 4000
       - key: ALLOWED_ORIGINS
-        value: "*"  # Will be updated after deployment with actual frontend URL
+        value: "https://capycare.onrender.com"
       # Add your API keys as environment variables in Render dashboard
       - key: APP_ID
         sync: false  # Set manually in Render dashboard
@@ -25,10 +26,11 @@ services:
   - type: web  
     name: symbiont-frontend
     env: node
-    buildCommand: cd client && npm install && npm run build
-    startCommand: cd client && npm run preview -- --host 0.0.0.0 --port $PORT
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview -- --host 0.0.0.0 --port $PORT
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: "https://symbiont-backend.onrender.com"  # Update this with your actual backend URL
+        value: "https://symbiont.onrender.com"
