@@ -6,102 +6,100 @@ import './Signup.css';
 
 // Animation configuration using individual frame files - EXACT SAME AS LOGIN
 const animations = {
-  celebrate: {
-    frames: ['capy_celebrate_000.png', 'capy_celebrate_001.png', 'capy_celebrate_002.png', 'capy_celebrate_003.png', 'capy_celebrate_004.png', 'capy_celebrate_005.png'],
-    fps: 3
-  },
-  eat: {
-    frames: ['capy_eat_000.png', 'capy_eat_001.png', 'capy_eat_002.png', 'capy_eat_003.png'],
-    fps: 3
-  },
-  idle: {
-    frames: ['capy_idle_000.png', 'capy_idle_001.png', 'capy_idle_002.png', 'capy_idle_003.png'],
-    fps: 2
-  },
-  sick: {
-    frames: ['capy_sick_000.png', 'capy_sick_001.png', 'capy_sick_002.png'],
-    fps: 2
-  },
-  walk: {
-    frames: ['capy_walk_000.png', 'capy_walk_001.png', 'capy_walk_002.png', 'capy_walk_003.png', 'capy_walk_004.png', 'capy_walk_005.png'],
-    fps: 4
-  }
+    celebrate: {
+        frames: ['capy_celebrate_000.png', 'capy_celebrate_001.png', 'capy_celebrate_002.png', 'capy_celebrate_003.png', 'capy_celebrate_004.png', 'capy_celebrate_005.png'],
+        fps: 3
+    },
+    eat: {
+        frames: ['capy_eat_000.png', 'capy_eat_001.png', 'capy_eat_002.png', 'capy_eat_003.png'],
+        fps: 3
+    },
+    idle: {
+        frames: ['capy_idle_000.png', 'capy_idle_001.png', 'capy_idle_002.png', 'capy_idle_003.png'],
+        fps: 2
+    },
+    sick: {
+        frames: ['capy_sick_000.png', 'capy_sick_001.png', 'capy_sick_002.png'],
+        fps: 2
+    },
+    walk: {
+        frames: ['capy_walk_000.png', 'capy_walk_001.png', 'capy_walk_002.png', 'capy_walk_003.png', 'capy_walk_004.png', 'capy_walk_005.png'],
+        fps: 4
+    }
 };
 
 // CapyAnimation Component using individual frames - EXACT SAME AS LOGIN
-const CapyAnimation = ({ 
-  state = 'idle', 
-  size = 128, 
-  className = '' 
+const CapyAnimation = ({
+    state = 'idle',
+    size = 128,
+    className = ''
 }) => {
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [loadedFrames, setLoadedFrames] = useState(new Set());
-  
-  const currentAnimation = animations[state] || animations.idle;
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [loadedFrames, setLoadedFrames] = useState(new Set());
 
-  // Preload all frames for the current animation
-  useEffect(() => {
-    const loadFrames = async () => {
-      const newLoadedFrames = new Set();
-      
-      for (const frame of currentAnimation.frames) {
-        try {
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = `/frames_resized/${frame}`;
-          });
-          newLoadedFrames.add(frame);
-        } catch (error) {
-          console.error(`Failed to load frame: ${frame}`, error);
-        }
-      }
-      
-      setLoadedFrames(newLoadedFrames);
-      setIsLoaded(newLoadedFrames.size === currentAnimation.frames.length);
-    };
+    const currentAnimation = animations[state] || animations.idle;
 
-    loadFrames();
-  }, [currentAnimation.frames]);
+    // Preload all frames for the current animation
+    useEffect(() => {
+        const loadFrames = async () => {
+            const newLoadedFrames = new Set();
 
-  // Animation loop
-  useEffect(() => {
-    if (!isLoaded) return;
+            for (const frame of currentAnimation.frames) {
+                try {
+                    const img = new Image();
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        img.src = `/frames_resized/${frame}`;
+                    });
+                    newLoadedFrames.add(frame);
+                } catch (error) {
+                    console.error(`Failed to load frame: ${frame}`, error);
+                }
+            }
 
-    const interval = setInterval(() => {
-      setCurrentFrame(prev => (prev + 1) % currentAnimation.frames.length);
-    }, 1000 / currentAnimation.fps);
+            setLoadedFrames(newLoadedFrames);
+            setIsLoaded(newLoadedFrames.size === currentAnimation.frames.length);
+        };
 
-    return () => clearInterval(interval);
-  }, [isLoaded, currentAnimation.fps, currentAnimation.frames.length]);
+        loadFrames();
+    }, [currentAnimation.frames]);
 
-  // Reset frame when state changes
-  useEffect(() => {
-    setCurrentFrame(0);
-  }, [state]);
+    // Animation loop
+    useEffect(() => {
+        if (!isLoaded) return;
 
-  const currentFramePath = `/frames_resized/${currentAnimation.frames[currentFrame]}`;
+        const interval = setInterval(() => {
+            setCurrentFrame(prev => (prev + 1) % currentAnimation.frames.length);
+        }, 1000 / currentAnimation.fps);
 
-  return (
-    <img
-      src={currentFramePath}
-      alt={`Capybara ${state} animation`}
-      width={size}
-      height={size}
-      className={className}
-      style={{
-        imageRendering: 'pixelated',
-        imageRendering: '-moz-crisp-edges',
-        imageRendering: 'crisp-edges',
-        border: 'none',
-        background: 'transparent',
-        borderRadius: '0',
-        transition: 'none'
-      }}
-    />
-  );
+        return () => clearInterval(interval);
+    }, [isLoaded, currentAnimation.fps, currentAnimation.frames.length]);
+
+    // Reset frame when state changes
+    useEffect(() => {
+        setCurrentFrame(0);
+    }, [state]);
+
+    const currentFramePath = `/frames_resized/${currentAnimation.frames[currentFrame]}`;
+
+    return (
+        <img
+            src={currentFramePath}
+            alt={`Capybara ${state} animation`}
+            width={size}
+            height={size}
+            className={className}
+            style={{
+                imageRendering: 'pixelated',
+                border: 'none',
+                background: 'transparent',
+                borderRadius: '0',
+                transition: 'none'
+            }}
+        />
+    );
 };
 
 function Signup({ onSwitchToLogin, onComplete }) {

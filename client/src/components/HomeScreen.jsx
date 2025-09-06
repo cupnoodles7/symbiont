@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 import './HomeScreen.css';
 import NutritionTracker from './NutritionTracker';
-import Community from './community'; // Ensure file is capitalized if named Community.js
+import Community from './community';
 import Profile from './Profile';
 import AIChatAssistant from './AIChatAssistant';
 import WorkoutAnalyzer from './WorkoutAnalyzer';

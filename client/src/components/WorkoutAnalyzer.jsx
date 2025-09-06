@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from '../config/api';
 import "./WorkoutAnalyzer.css";
 
 export default function WorkoutAnalyzer() {
@@ -54,7 +55,7 @@ export default function WorkoutAnalyzer() {
     try {
       // Choose endpoint based on analysis mode
       const endpoint = analysisMode === "motion" ? "detect_motion" : "analyze";
-      const res = await axios.post(`http://localhost:5000/${endpoint}`, formData, {
+      const res = await axios.post(`${API_ENDPOINTS.WORKOUT_ANALYZER}/${endpoint}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setFeedback(res.data);
@@ -215,15 +216,15 @@ export default function WorkoutAnalyzer() {
                   <p>Confidence: {(feedback.confidence * 100)?.toFixed(1)}%</p>
                 </div>
               </div>
-              
+
               <div className="activity-scores">
                 <h4>All Activity Scores</h4>
                 {feedback.all_activities && Object.entries(feedback.all_activities).map(([activity, score]) => (
                   <div key={activity} className="activity-score">
                     <span className="activity-name">{activity}</span>
                     <div className="score-bar">
-                      <div 
-                        className="score-fill" 
+                      <div
+                        className="score-fill"
                         style={{ width: `${score * 100}%` }}
                       ></div>
                     </div>
@@ -231,7 +232,7 @@ export default function WorkoutAnalyzer() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Movement Statistics */}
               <div className="movement-stats">
                 <h4>Movement Analysis</h4>

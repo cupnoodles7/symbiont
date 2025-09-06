@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-const CapyAnimation = ({ 
-    state = 'idle', 
-    size = 128, 
-    className = '' 
+const CapyAnimation = ({
+    state = 'idle',
+    size = 128,
+    className = ''
 }) => {
     const [currentFrame, setCurrentFrame] = useState(0);
-    
+
     // Frame configurations based on your frames_resized folder
     const animations = {
         idle: {
@@ -56,9 +56,7 @@ const CapyAnimation = ({
             height={size}
             className={className}
             style={{
-                imageRendering: 'pixelated',
-                imageRendering: '-moz-crisp-edges',
-                imageRendering: 'crisp-edges'
+                imageRendering: 'pixelated'
             }}
         />
     );

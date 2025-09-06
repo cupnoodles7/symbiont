@@ -4,30 +4,30 @@ import './CapybaraSprite.css';
 
 // Animation configuration using individual frame files - SAME AS LOGIN/SIGNUP
 const animations = {
-  celebrate: {
-    frames: ['capy_celebrate_000.png', 'capy_celebrate_001.png', 'capy_celebrate_002.png', 'capy_celebrate_003.png', 'capy_celebrate_004.png', 'capy_celebrate_005.png'],
-    fps: 3
-  },
-  eat: {
-    frames: ['capy_eat_000.png', 'capy_eat_001.png', 'capy_eat_002.png', 'capy_eat_003.png'],
-    fps: 3
-  },
-  idle: {
-    frames: ['capy_idle_000.png', 'capy_idle_001.png', 'capy_idle_002.png', 'capy_idle_003.png'],
-    fps: 2
-  },
-  sick: {
-    frames: ['capy_sick_000.png', 'capy_sick_001.png', 'capy_sick_002.png'],
-    fps: 2
-  },
-  walk: {
-    frames: ['capy_walk_000.png', 'capy_walk_001.png', 'capy_walk_002.png', 'capy_walk_003.png', 'capy_walk_004.png', 'capy_walk_005.png'],
-    fps: 4
-  }
+    celebrate: {
+        frames: ['capy_celebrate_000.png', 'capy_celebrate_001.png', 'capy_celebrate_002.png', 'capy_celebrate_003.png', 'capy_celebrate_004.png', 'capy_celebrate_005.png'],
+        fps: 3
+    },
+    eat: {
+        frames: ['capy_eat_000.png', 'capy_eat_001.png', 'capy_eat_002.png', 'capy_eat_003.png'],
+        fps: 3
+    },
+    idle: {
+        frames: ['capy_idle_000.png', 'capy_idle_001.png', 'capy_idle_002.png', 'capy_idle_003.png'],
+        fps: 2
+    },
+    sick: {
+        frames: ['capy_sick_000.png', 'capy_sick_001.png', 'capy_sick_002.png'],
+        fps: 2
+    },
+    walk: {
+        frames: ['capy_walk_000.png', 'capy_walk_001.png', 'capy_walk_002.png', 'capy_walk_003.png', 'capy_walk_004.png', 'capy_walk_005.png'],
+        fps: 4
+    }
 };
 
-const CapybaraSprite = ({ 
-    currentState = 'idle', 
+const CapybaraSprite = ({
+    currentState = 'idle',
     size = 128,
     context = 'home',
     showDescription = true,
@@ -39,9 +39,9 @@ const CapybaraSprite = ({
     const [currentFrame, setCurrentFrame] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
     const [loadedFrames, setLoadedFrames] = useState(new Set());
-    
+
     const currentAnimation = animations[capybaraState] || animations.idle;
-    
+
     // Use personalized messages
     const { currentMessage } = usePersonalizedMessages(activityLog, xpScore, context);
 
@@ -54,7 +54,7 @@ const CapybaraSprite = ({
     useEffect(() => {
         const loadFrames = async () => {
             const newLoadedFrames = new Set();
-            
+
             for (const frame of currentAnimation.frames) {
                 try {
                     const img = new Image();
@@ -68,7 +68,7 @@ const CapybaraSprite = ({
                     console.error(`Failed to load frame: ${frame}`, error);
                 }
             }
-            
+
             setLoadedFrames(newLoadedFrames);
             setIsLoaded(newLoadedFrames.size === currentAnimation.frames.length);
         };
@@ -144,8 +144,6 @@ const CapybaraSprite = ({
                         className="capybara-animation"
                         style={{
                             imageRendering: 'pixelated',
-                            imageRendering: '-moz-crisp-edges',
-                            imageRendering: 'crisp-edges',
                             border: 'none',
                             background: 'transparent',
                             borderRadius: '0',
@@ -154,9 +152,9 @@ const CapybaraSprite = ({
                     />
                 ) : (
                     <div className="sprite-fallback">
-                        <img 
-                            src="/cappy.png" 
-                            alt="Capybara" 
+                        <img
+                            src="/cappy.png"
+                            alt="Capybara"
                             className="fallback-image"
                             style={{ width: size, height: size }}
                         />
@@ -169,7 +167,7 @@ const CapybaraSprite = ({
                     </div>
                 )}
             </div>
-            
+
             {showDescription && (
                 <div className="state-indicator">
                     <div className="state-emoji">{stateInfo.emoji}</div>

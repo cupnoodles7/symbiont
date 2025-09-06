@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './MotionDetector.css';
 
-const SERVER_URL = "http://localhost:5000"; // Change to your deployed URL
+import { PYTHON_API_URL } from '../config/api';
+
+const SERVER_URL = PYTHON_API_URL;
 
 export default function MotionDetector() {
   const [result, setResult] = useState(null);
@@ -23,7 +25,7 @@ export default function MotionDetector() {
   const handleUpload = async () => {
     const fileInput = document.getElementById('cctv-video-input');
     const file = fileInput.files[0];
-    
+
     if (!file) {
       setError('Please select a video file');
       return;
@@ -152,7 +154,7 @@ export default function MotionDetector() {
           </div>
 
           <div className="main-detection">
-            <div 
+            <div
               className="detected-activity"
               style={{ borderColor: getActivityColor(result.detected_activity) }}
             >
@@ -177,9 +179,9 @@ export default function MotionDetector() {
                     {getActivityIcon(activity)} {activity.charAt(0).toUpperCase() + activity.slice(1)}
                   </span>
                   <div className="score-bar">
-                    <div 
+                    <div
                       className="score-fill"
-                      style={{ 
+                      style={{
                         width: `${score * 100}%`,
                         backgroundColor: getActivityColor(activity)
                       }}

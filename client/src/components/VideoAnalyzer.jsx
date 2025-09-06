@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from '../config/api';
 import "./VideoAnalyzer.css";
 
 export default function VideoAnalyzer() {
@@ -72,7 +73,7 @@ export default function VideoAnalyzer() {
         formData.append("video", video);
     
         try {
-          const res = await axios.post("http://localhost:5000/analyze-activity", formData, {
+          const res = await axios.post(API_ENDPOINTS.ANALYZE_ACTIVITY, formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
           setAnalysis(res.data);
