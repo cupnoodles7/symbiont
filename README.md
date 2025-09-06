@@ -128,7 +128,8 @@ A comprehensive virtual pet capybara game with health tracking, AI assistance, a
 
 ## 📱 Screenshots
 
-*Your virtual capybara companion with beautiful glassmorphism UI, health tracking dashboard, and AI-powered assistance - all in one seamless experience!*
+<img width="1882" height="901" alt="image" src="https://github.com/user-attachments/assets/5d865476-a1e6-438f-ad8d-323b7278d5df" />
+
 
 ## 🤝 Contributing
 
@@ -150,6 +151,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ and lots of ☕ by [cupnoodles7](https://github.com/cupnoodles7)**
+**Made with ❤️ and lots of ☕ by [cupnoodles7](https://github.com/cupnoodles7), [bbhoom](https://github.com/bbhoom), [Chida-Singh69](https://github.com/Chida-Singh69),[Richard-Jophy](https://github.com/Richard-Jophy) **
 
 *Take care of your capybara, take care of yourself! 🐹💚*
