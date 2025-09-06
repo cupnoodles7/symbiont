@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
+import { API_ENDPOINTS } from '../config/api';
 import './AIChatAssistant.css';
 
 function AIChatAssistant({ onClose }) {
@@ -124,7 +125,7 @@ function AIChatAssistant({ onClose }) {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:4000/api/gemini/chat', {
+            const response = await fetch(API_ENDPOINTS.GEMINI_CHAT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

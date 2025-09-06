@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 import './NutritionTracker.css';
 
 function NutritionTracker() {
@@ -102,7 +103,7 @@ function NutritionTracker() {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:4000/search?food=${encodeURIComponent(searchQuery)}`);
+            const response = await fetch(`${API_ENDPOINTS.SEARCH}?food=${encodeURIComponent(searchQuery)}`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -134,7 +135,7 @@ function NutritionTracker() {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:4000/nutrition', {
+            const response = await fetch(API_ENDPOINTS.NUTRITION, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
