@@ -1,0 +1,40 @@
+services:
+  # Backend API Server
+  - type: web
+    name: symbiont-backend
+    env: node
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: ALLOWED_ORIGINS
+        fromService:
+          type: web
+          name: symbiont-frontend
+          property: url
+      # Add your API keys as environment variables in Render dashboard
+      - key: APP_ID
+        sync: false  # Set manually in Render dashboard
+      - key: APP_KEY
+        sync: false  # Set manually in Render dashboard  
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+    healthCheckPath: /health
+    
+  # Frontend React App
+  - type: web  
+    name: symbiont-frontend
+    env: node
+    buildCommand: cd client && npm install && npm run build
+    startCommand: cd client && npm run preview -- --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: symbiont-backend
+          property: url
