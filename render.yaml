@@ -11,10 +11,7 @@ services:
       - key: PORT
         value: 4000
       - key: ALLOWED_ORIGINS
-        fromService:
-          type: web
-          name: symbiont-frontend
-          property: https://placeholder-frontend-url
+        value: "*"  # Will be updated after deployment with actual frontend URL
       # Add your API keys as environment variables in Render dashboard
       - key: APP_ID
         sync: false  # Set manually in Render dashboard
@@ -34,7 +31,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: symbiont-backend
-          property: https://placeholder-frontend-url
+        value: "https://symbiont-backend.onrender.com"  # Update this with your actual backend URL
