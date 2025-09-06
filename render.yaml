@@ -14,7 +14,7 @@ services:
         fromService:
           type: web
           name: symbiont-frontend
-          property: url
+          property: https://placeholder-frontend-url
       # Add your API keys as environment variables in Render dashboard
       - key: APP_ID
         sync: false  # Set manually in Render dashboard
@@ -37,4 +37,4 @@ services:
         fromService:
           type: web
           name: symbiont-backend
-          property: url
+          property: https://placeholder-frontend-url
